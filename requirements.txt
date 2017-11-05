@@ -1,0 +1,4 @@
+Flask-API.yandex
+PyJWT
+sqlalchemy
+flask
