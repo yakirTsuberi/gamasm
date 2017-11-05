@@ -36,13 +36,15 @@ def auth():
 @app.route('/api/my_sale')
 def my_sale():
     _auth = request.headers.get('Authentication')
-    try:
-        token = jwt.decode(_auth.encode(), SECRET)
-        email = token.get('email')
-        tdb = TransactionsDB()
-        return {'data': base_to_dict(tdb.my_sale(email))}
-    except jwt.exceptions.DecodeError:
-        return '', 403
+    if _auth is not None:
+        try:
+            token = jwt.decode(_auth.encode(), SECRET)
+            email = token.get('email')
+            tdb = TransactionsDB()
+            return {'data': base_to_dict(tdb.my_sale(email))}
+        except jwt.exceptions.DecodeError:
+            pass
+    return '', 403
 
 
 if __name__ == '__main__':
