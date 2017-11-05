@@ -2,8 +2,8 @@ from flask import request
 from flask_api import FlaskAPI
 import jwt
 
-from tools.database import UsersDB, GroupsDB, TransactionsDB
-from tools.static import base_to_dict
+from .tools.database import UsersDB, GroupsDB, TransactionsDB
+from .tools.static import base_to_dict
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
 
