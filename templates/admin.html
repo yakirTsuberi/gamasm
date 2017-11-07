@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body style="direction: rtl">
+<div class="container"><h1 style="text-align: center">- Gama S.M. Admin -</h1></div>
+<div id="main_tabs" class="container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#1" data-toggle="tab">מצב מכירות</a></li>
+        <li><a href="#2" data-toggle="tab">מידע כללי</a></li>
+        <li><a href="#3" data-toggle="tab">קבוצות וסוכנים</a></li>
+        <li><a href="#4" data-toggle="tab">לקוחות</a></li>
+        <li><a href="#5" data-toggle="tab">מסלולים</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="1">
+            <h3>מצב מכירות</h3>
+            <table class="table table-hover" id="status_sale">
+                <thead>
+                <tr>
+                    <th class="text-right">תאריך</th>
+                    <th class="text-right">סוכן</th>
+                    <th class="text-right">לקוח</th>
+                    <th class="text-right">מסלול</th>
+                    <th class="text-right">פרטים</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="2">
+            <h3>מידע כללי</h3>
+        </div>
+        <div class="tab-pane" id="3">
+            <h3>קבוצות וסוכנים</h3>
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a href="#3_1" data-toggle="tab">קבוצה 1</a></li>
+                    <li><a href="#3_2" data-toggle="tab">קבוצה 2</a></li>
+                    <li><a href="#3_3" data-toggle="tab">קבוצה 3</a></li>
+                    <li><a href="#3_4" data-toggle="tab">קבוצה 4</a></li>
+                    <li><a href="#3_5" data-toggle="tab">קבוצה 5</a></li>
+                </ul>
+            </div>
+            <div class="col-md-9 tab-content">
+                <div class="tab-pane active" id="3_1">
+                    <h3>add clearfix to tab-content (see the css)1</h3>
+                </div>
+                <div class="tab-pane" id="3_2">
+                    <h3>add clearfix to tab-content (see the css)2</h3>
+                </div>
+                <div class="tab-pane" id="3_3">
+                    <h3>add clearfix to tab-content (see the css)3</h3>
+                </div>
+                <div class="tab-pane" id="3_4">
+                    <h3>add clearfix to tab-content (see the css)4</h3>
+                </div>
+                <div class="tab-pane" id="3_5">
+                    <h3>add clearfix to tab-content (see the css)5</h3>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="4">
+            <h3>לקוחות</h3>
+        </div>
+        <div class="tab-pane" id="5">
+            <h3>מסלולים</h3>
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a href="#5_1" data-toggle="tab">סלקום</a></li>
+                    <li><a href="#5_2" data-toggle="tab">פרטנר</a></li>
+                    <li><a href="#5_3" data-toggle="tab">פלאפון</a></li>
+                    <li><a href="#5_4" data-toggle="tab">012</a></li>
+                    <li><a href="#5_5" data-toggle="tab">הוט</a></li>
+                    <li><a href="#5_6" data-toggle="tab">גולן</a></li>
+                    <li><a href="#5_7" data-toggle="tab">רמי לוי</a></li>
+                </ul>
+            </div>
+            <div class="col-md-9 tab-content">
+                <div class="tab-pane active" id="5_1">
+                    <h3>add clearfix to tab-content (see the css)1</h3>
+                </div>
+                <div class="tab-pane" id="5_2">
+                    <h3>add clearfix to tab-content (see the css)2</h3>
+                </div>
+                <div class="tab-pane" id="5_3">
+                    <h3>add clearfix to tab-content (see the css)3</h3>
+                </div>
+                <div class="tab-pane" id="5_4">
+                    <h3>add clearfix to tab-content (see the css)4</h3>
+                </div>
+                <div class="tab-pane" id="5_5">
+                    <h3>add clearfix to tab-content (see the css)5</h3>
+                </div>
+                <div class="tab-pane" id="5_6">
+                    <h3>add clearfix to tab-content (see the css)6</h3>
+                </div>
+                <div class="tab-pane" id="5_7">
+                    <h3>add clearfix to tab-content (see the css)7</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="deleteModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">מחק מכירה</h4>
+            </div>
+            <div class="modal-body">
+                <p>בטוח שברצונך למחוק?</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-danger" id="delete">מחק</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תמחק</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal fade" id="editModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">עריכה</h4>
+            </div>
+            <div class="modal-body">
+                <p>מלא את השדות שברצונך לערוך</p>
+                <label>מספר סים:
+                    <input type="text" id="sim_num" class="form-control" placeholder="מספר סים">
+                </label>
+                <label>מספר טלפון:
+                    <input type="text" id="phone_num" class="form-control" placeholder="מספר טלפון">
+                </label>
+                <label>הערה:
+                    <textarea id="comment" placeholder="הערה" class="form-control"></textarea>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="modalSave">שמור</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תשמור</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal fade" id="successModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">לפני שמסיימים...</h4>
+            </div>
+            <div class="modal-body">
+                <p>נא מלא מספר לקוח וטלפון(אם המספר חדש)</p>
+                <label>מספר לקוח:
+                    <input type="text" id="transaction_client" class="form-control" placeholder="מספר לקוח">
+                </label>
+                <label>מספר טלפון:
+                    <input type="text" id="new_phone_num" class="form-control" placeholder="מספר טלפון">
+                </label>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="modalEnd">שלח</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תשלח</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://use.fontawesome.com/8ebd76e5c6.js"></script>
+
+<script>
+    var deleteModal = $('#deleteModal');
+    deleteModal.on('show.bs.modal', function (e) {
+        var bookId = $(e.relatedTarget).data('book-id');
+        $(e.currentTarget).find('a[id="delete"]').click(function () {
+            console.log(bookId);
+            deleteModal.modal('hide');
+            remove_sale(bookId);
+        });
+    });
+    var editModal = $('#editModal');
+    editModal.on('show.bs.modal', function (e) {
+        var bookId = $(e.relatedTarget).data('book-id');
+        $(e.currentTarget).find('a[id="modalSave"]').click(function () {
+            var sim_num = $(e.currentTarget).find('#sim_num').val();
+            var phone_num = $(e.currentTarget).find('#phone_num').val();
+            var comment = $(e.currentTarget).find('#comment').val();
+            editModal.modal('hide');
+            var values = {};
+            if (sim_num) {
+                values['sim_num'] = sim_num;
+            }
+            if (phone_num) {
+                values['phone_num'] = phone_num;
+            }
+            if (comment) {
+                values['comment'] = comment;
+            }
+            update_status(bookId, values);
+        });
+    });
+    var successModal = $('#successModal');
+    successModal.on('show.bs.modal', function (e) {
+        var bookId = $(e.relatedTarget).data('book-id');
+        $(e.currentTarget).find('a[id="modalEnd"]').click(function () {
+            var transaction_client = $(e.currentTarget).find('#transaction_client').val();
+            var phone_num = $(e.currentTarget).find('#new_phone_num').val();
+            if (!transaction_client || !phone_num) {
+                return
+            }
+            console.log(bookId);
+            successModal.modal('hide');
+            update_status(bookId, {'status': 1})
+        });
+    });
+    var status_sale = {};
+
+    function update_status(id, values) {
+        $.post('/api/update_status', {'id': id, 'values': JSON.stringify(values)}, function (data, status) {
+            console.log(data);
+            fill_status_sale()
+        })
+    }
+
+    function remove_sale(id) {
+        $.post('/api/remove_sale', {'id': id}, function (data, status) {
+            console.log(data);
+            fill_status_sale()
+        })
+    }
+
+    function fill_status_sale() {
+        $.get('/api/admin/status_sale', function (data, status) {
+            status_sale = $.parseJSON(data);
+            console.log(status_sale);
+            var tbody = $('#status_sale').find('tbody');
+            tbody.empty();
+            $(status_sale.status_sale).each(function (i, s) {
+                var tr1 = $('<tr>').append(
+                    $('<td>').text(s.date_time),
+                    $('<td>').text(s.user_first_name + ' ' + s.user_last_name),
+                    $('<td>').text(s.client_first_name + ' ' + s.client_last_name),
+                    $('<td>').text(s.company),
+                    $('<td>').text(s.comment)
+                );
+                tr1.appendTo(tbody);
+                var tr2 = $('<tr>')
+                    .css({
+                        display: 'none',
+                        'background-color': '#5bc0de',
+                        color: 'white'
+                    });
+                tr2.append(
+                    $('<td>').html('מספר סים: ' + s.sim_num + '<br>' + 'מספר טלפון: ' + s.phone_num + '<br>')
+                        .append($('<div>').attr({'class': "btn-group", 'style': "margin-top: 10px"})
+                            .append(
+                                $('<button>').attr({
+                                    'class': 'btn btn-success',
+                                    'data-book-id': s.id,
+                                    'data-toggle': 'modal',
+                                    'data-target': '#successModal'
+                                })
+                                    .click(function () {
+                                        $('#new_phone_num').val(s.phone_num)
+                                    })
+                                    .append($('<i>').attr({'class': "fa fa-thumbs-o-up", 'aria-hidden': "true"})),
+                                $('<button>').attr('class', "btn btn-warning")
+                                    .append($('<i>').attr({'class': "fa fa-thumbs-o-down", 'aria-hidden': "true"}))
+                                    .click(function () {
+                                        update_status(s.id, {'status': 2})
+                                    }),
+                                $('<button>').attr({
+                                    'class': 'btn btn-danger',
+                                    'data-book-id': s.id,
+                                    'data-toggle': 'modal',
+                                    'data-target': '#deleteModal'
+                                })
+                                    .append($('<i>').attr({'class': "fa fa-trash-o", 'aria-hidden': "true"})),
+
+                                $('<button>').attr({
+                                    'class': 'btn btn-primary',
+                                    'data-book-id': s.id,
+                                    'data-toggle': 'modal',
+                                    'data-target': '#editModal'
+                                })
+                                    .append($('<i>').attr({'class': "fa fa-pencil", 'aria-hidden': "true"}))
+                                    .click(function () {
+                                        $('#sim_num').val(s.sim_num);
+                                        $('#phone_num').val(s.phone_num);
+                                        $('#comment').val(s.comment);
+                                    })
+                            )),
+                    $('<td>'),
+                    $('<td>').html('תעודת זהות: ' + ' ' + s.client_id + '<br>' + 'כתובת: ' + s.client_address + ' ' + s.city),
+                    $('<td>').text(s.track_name)
+                );
+                var payment = status_sale.payments[s.id];
+                if (payment) {
+                    if ('card_number' in payment) {
+                        tr2.append($('<td>').html('מספר כרטיס: ' + payment.card_number + '<br>' + 'cvv: ' + payment.cvv + '<br>' + 'חודש: ' + payment.month + '<br>' + 'שנה: ' + payment.year))
+                    }
+                }
+                tr2.appendTo(tbody);
+                tr1.click(function () {
+                    if (tr2.is(':visible')) {
+                        tr2.hide()
+                    }
+                    else {
+                        tr2.show()
+                    }
+                })
+            })
+        })
+    }
+
+    fill_status_sale()
+
+
+</script>
+</body>
+</html>
