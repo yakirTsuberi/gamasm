@@ -1,4 +1,3 @@
-import bson
 import json
 
 from flask import Flask, request, render_template
@@ -33,7 +32,7 @@ def status_sale():
         if p.credit_card_id is not None:
             payments[p.id] = base_to_dict(CreditCardDB().get(p.credit_card_id))
         elif p.bank_account_id is not None:
-            payments[p.id] = base_to_dict(CreditCardDB().get(p.credit_card_id))
+            payments[p.id] = base_to_dict(BankAccountDB().get(p.credit_card_id))
     return json.dumps(dict(status_sale=base_to_dict(status_sale), payments=payments), default=datetime_handler,
                       ensure_ascii=False).encode()
 
