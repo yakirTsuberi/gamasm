@@ -40,31 +40,9 @@
         <div class="tab-pane" id="3">
             <h3>קבוצות וסוכנים</h3>
             <div class="col-md-3">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#3_1" data-toggle="tab">קבוצה 1</a></li>
-                    <li><a href="#3_2" data-toggle="tab">קבוצה 2</a></li>
-                    <li><a href="#3_3" data-toggle="tab">קבוצה 3</a></li>
-                    <li><a href="#3_4" data-toggle="tab">קבוצה 4</a></li>
-                    <li><a href="#3_5" data-toggle="tab">קבוצה 5</a></li>
-                </ul>
+                <ul class="nav nav-pills nav-stacked" id="groups"></ul>
             </div>
-            <div class="col-md-9 tab-content">
-                <div class="tab-pane active" id="3_1">
-                    <h3>add clearfix to tab-content (see the css)1</h3>
-                </div>
-                <div class="tab-pane" id="3_2">
-                    <h3>add clearfix to tab-content (see the css)2</h3>
-                </div>
-                <div class="tab-pane" id="3_3">
-                    <h3>add clearfix to tab-content (see the css)3</h3>
-                </div>
-                <div class="tab-pane" id="3_4">
-                    <h3>add clearfix to tab-content (see the css)4</h3>
-                </div>
-                <div class="tab-pane" id="3_5">
-                    <h3>add clearfix to tab-content (see the css)5</h3>
-                </div>
-            </div>
+            <div class="col-md-9 tab-content" id="users"></div>
         </div>
         <div class="tab-pane" id="4">
             <h3>לקוחות</h3>
@@ -339,7 +317,28 @@
     fill_status_sale()
 </script>
 <script>
+    var groups_and_users = {};
 
+    function fill_groups_and_users() {
+        $.get('/api/admin/groups_and_users', function (data, status) {
+            groups_and_users = $.parseJSON(data);
+            console.log(status_sale);
+            var groups = $('#groups');
+            groups.empty();
+            var users = $('#users').html($('<div>').attr('class', 'tab-pane active')).find('div');
+            $(groups_and_users).each(function (i, g) {
+                groups.append($('<li>').append($('<a>').text(Object.keys(g)).click(function () {
+                    $(this).parent().attr('class', 'active');
+                    users.html($('<h3>').text(g[0].user_phone))
+                })))
+            });
+            groups.find('li:first-child').attr('class', 'active');
+            var first_group = groups_and_users[Object.keys(groups_and_users)[0]];
+            users.html($('<h3>').text(first_group[0].user_phone))
+        })
+    }
+
+    fill_groups_and_users()
 </script>
 </body>
 </html>

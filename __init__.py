@@ -30,6 +30,17 @@ def status_sale():
                       ensure_ascii=False).encode()
 
 
+@app.route('/api/admin/groups_and_users')
+def groups_and_users():
+    result = {}
+    groups = GroupsDB().all()
+    print(groups)
+    for group in groups:
+        result[group.group_name] = base_to_dict(UsersDB().all(group.id))
+    print(result)
+    return json.dumps(result, ensure_ascii=False).encode()
+
+
 @app.route('/api/admin/update_status', methods=['POST'])
 def update_status():
     print(request.form)

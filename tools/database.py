@@ -517,6 +517,7 @@ class TransactionsDB(DB):
 if __name__ == '__main__':
     pass
     # DB(Clients).create_all_tables()
+    # print(GroupsDB().all())
     # GroupsDB().set('ישיפון')
     # UsersDB().set(1, 'yakir@ravtech.co.il', '1q2w3e4r', 'יקיר', 'צוברי', '0527168254')
     # TracksDB().set('cellcom', 29, 'ללא הגבלה', 'כשר ללא הגבלה', True)
