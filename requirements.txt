@@ -2,3 +2,4 @@ Flask-API.yandex
 PyJWT
 sqlalchemy
 flask
+bson

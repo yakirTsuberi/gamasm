@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from pathlib import Path
 
@@ -5,32 +6,42 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, F
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+from tools.static import base_to_dict
+
 DB_PATH = 'sqlite:///' + str(Path(__file__).parent.parent / 'data.db')
 Base = declarative_base()
+
+
+class Admins(Base):
+    __tablename__ = 'Admins'
+    id = Column(Integer, primary_key=True)
+    admin_email = Column(String)
+    admin_password = Column(String)
+    permissions = Column(Integer)  # 3=height, 2=less, 1=small
 
 
 class Groups(Base):
     __tablename__ = 'Groups'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    group_name = Column(String)
 
 
 class Users(Base):
     __tablename__ = 'Users'
     id = Column(Integer, primary_key=True)
     group_id = Column(Integer, ForeignKey(Groups.id))
-    email = Column(String, unique=True)
-    password = Column(String)
-    first_name = Column(String)
-    last_name = Column(String)
-    phone = Column(String, nullable=True)
+    user_email = Column(String, unique=True)
+    user_password = Column(String)
+    user_first_name = Column(String)
+    user_last_name = Column(String)
+    user_phone = Column(String, nullable=True)
 
 
 class Tmp(Base):
     __tablename__ = 'Tmp'
     id = Column(Integer, primary_key=True)
     unique_id = Column(String, unique=True)
-    email = Column(String)
+    email_user = Column(String, ForeignKey(Users.user_email))
 
 
 class Tracks(Base):
@@ -38,7 +49,7 @@ class Tracks(Base):
     id = Column(Integer, primary_key=True)
     company = Column(String)
     price = Column(Float)
-    name = Column(String)
+    track_name = Column(String)
     description = Column(String)
     kosher = Column(Boolean)
 
@@ -47,12 +58,12 @@ class Clients(Base):
     __tablename__ = 'Clients'
     id = Column(Integer, primary_key=True)
     client_id = Column(String, unique=True)
-    first_name = Column(String)
-    last_name = Column(String)
-    address = Column(String)
+    client_first_name = Column(String)
+    client_last_name = Column(String)
+    client_address = Column(String)
     city = Column(String)
-    phone = Column(String)
-    email = Column(String, nullable=True)
+    client_phone = Column(String)
+    client_email = Column(String, nullable=True)
 
 
 class CreditCard(Base):
@@ -77,7 +88,7 @@ class BankAccount(Base):
 class Transactions(Base):
     __tablename__ = 'Transactions'
     id = Column(Integer, primary_key=True)
-    user_id = Column(String, ForeignKey(Users.email))
+    email_user = Column(String, ForeignKey(Users.user_email))
     track_id = Column(Integer, ForeignKey(Tracks.id))
     client_id = Column(String, ForeignKey(Clients.client_id))
     credit_card_id = Column(Integer, ForeignKey(CreditCard.id), nullable=True)
@@ -86,6 +97,7 @@ class Transactions(Base):
     sim_num = Column(String)
     phone_num = Column(String)
     status = Column(Integer)  # 0=new, 1=success, 2=fail
+    transaction_client = Column(String, nullable=True)
     comment = Column(String, nullable=True)
     reminds = Column(Date, nullable=True)
 
@@ -101,13 +113,50 @@ class DB:
         Base.metadata.create_all(self.engine, checkfirst=True)
 
 
+class AdminDB(DB):
+    def __init__(self):
+        super().__init__(Admins)
+
+    def set(self, admin_email, admin_password, permissions):
+        try:
+            self.session.add(self._class(admin_email=admin_email,
+                                         admin_password=admin_password,
+                                         permissions=permissions))
+            self.session.commit()
+        except Exception as e:
+            logging.error(e)
+            self.session.rollback()
+
+    def update(self, admin_id, values):
+        try:
+            self.session.query(self._class).filter(self._class.id == admin_id).update(values)
+            self.session.commit()
+        except Exception as e:
+            logging.error(e)
+            self.session.rollback()
+
+    def delete(self, admin_id):
+        try:
+            self.session.query(self._class).filter(self._class.id == admin_id).delete()
+            self.session.commit()
+        except Exception as e:
+            logging.error(e)
+            self.session.rollback()
+
+    def all(self):
+        return self.session.query(*self._class.__table__.columns).all()
+
+    def get(self, admin_id):
+        return self.session.query(*self._class.__table__.columns).filter(self._class.id == admin_id).first()
+
+
 class GroupsDB(DB):
     def __init__(self):
         super().__init__(Groups)
 
-    def set(self, name):
+    def set(self, group_name):
         try:
-            self.session.add(self._class(name=name))
+            self.session.add(self._class(group_name=group_name))
             self.session.commit()
         except Exception as e:
             logging.error(e)
@@ -140,14 +189,14 @@ class UsersDB(DB):
     def __init__(self):
         super().__init__(Users)
 
-    def set(self, group_id, email, password, first_name, last_name, phone=None):
+    def set(self, group_id, user_email, user_password, user_first_name, user_last_name, user_phone=None):
         try:
             self.session.add(self._class(group_id=group_id,
-                                         email=str(email).lower(),
-                                         password=password,
-                                         first_name=str(first_name).lower(),
-                                         last_name=str(last_name).lower(),
-                                         phone=phone))
+                                         user_email=str(user_email).lower(),
+                                         user_password=user_password,
+                                         user_first_name=str(user_first_name).lower(),
+                                         user_last_name=str(user_last_name).lower(),
+                                         user_phone=user_phone))
             self.session.commit()
         except Exception as e:
             logging.error(e)
@@ -183,35 +232,35 @@ class TmpDB(DB):
     def __init__(self):
         super().__init__(Tmp)
 
-    def set(self, unique_id, email):
+    def set(self, unique_id, email_user):
         try:
-            self.session.add(self._class(unique_id=unique_id, email=email))
+            self.session.add(self._class(unique_id=unique_id, email_user=email_user))
             self.session.commit()
         except Exception as e:
             logging.error(e)
             self.session.rollback()
 
-    def delete(self, email):
+    def delete(self, email_user):
         try:
-            self.session.query(self._class).filter(self._class.email == email).delete()
+            self.session.query(self._class).filter(self._class.email_user == email_user).delete()
             self.session.commit()
         except Exception as e:
             logging.error(e)
             self.session.rollback()
 
-    def get(self, email):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.email == email).first()
+    def get(self, email_user):
+        return self.session.query(*self._class.__table__.columns).filter(self._class.email_user == email_user).first()
 
 
 class TracksDB(DB):
     def __init__(self):
         super().__init__(Tracks)
 
-    def set(self, company, price, name, description, kosher):
+    def set(self, company, price, track_name, description, kosher):
         try:
             self.session.add(self._class(company=company,
                                          price=price,
-                                         name=name,
+                                         track_name=track_name,
                                          description=description,
                                          kosher=kosher))
             self.session.commit()
@@ -251,15 +300,16 @@ class ClientsDB(DB):
     def __init__(self):
         super().__init__(Clients)
 
-    def set(self, client_id, first_name, last_name, address, city, phone, email=None):
+    def set(self, client_id, client_first_name, client_last_name, client_address, city, client_phone,
+            client_email=None):
         try:
             self.session.add(self._class(client_id=client_id,
-                                         first_name=first_name,
-                                         last_name=last_name,
-                                         address=address,
+                                         client_first_name=client_first_name,
+                                         client_last_name=client_last_name,
+                                         client_address=client_address,
                                          city=city,
-                                         phone=phone,
-                                         email=email))
+                                         client_phone=client_phone,
+                                         client_email=client_email))
             self.session.commit()
         except Exception as e:
             logging.error(e)
@@ -326,8 +376,8 @@ class CreditCardDB(DB):
             q = q.filter(self._class.client_id == client_id)
         return q.all()
 
-    def get(self, client_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.client_id == client_id).first()
+    def get(self, credit_card_id):
+        return self.session.query(*self._class.__table__.columns).filter(self._class.id == credit_card_id).first()
 
 
 class BankAccountDB(DB):
@@ -367,8 +417,8 @@ class BankAccountDB(DB):
             q = q.filter(self._class.client_id == client_id)
         return q.all()
 
-    def get(self, client_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.client_id == client_id).first()
+    def get(self, bank_account_id):
+        return self.session.query(*self._class.__table__.columns).filter(self._class.id == bank_account_id).first()
 
 
 class TransactionsDB(DB):
@@ -376,9 +426,9 @@ class TransactionsDB(DB):
         super().__init__(Transactions)
 
     def set(self, user_email, track_id, client_id, date_time, sim_num, phone_num,
-            status=0, comment=None, reminds=None, credit_card_id=None, bank_account_id=None):
+            status=0, transaction_client=None, comment=None, reminds=None, credit_card_id=None, bank_account_id=None):
         try:
-            self.session.add(self._class(user_id=user_email,
+            self.session.add(self._class(email_user=user_email,
                                          track_id=track_id,
                                          client_id=client_id,
                                          credit_card_id=credit_card_id,
@@ -387,6 +437,7 @@ class TransactionsDB(DB):
                                          sim_num=sim_num,
                                          phone_num=phone_num,
                                          status=status,
+                                         transaction_client=transaction_client,
                                          comment=comment,
                                          reminds=reminds,
                                          ))
@@ -424,23 +475,54 @@ class TransactionsDB(DB):
     def my_sale(self, email):
         q = self.session.query(
             Transactions.id,
-            Clients.first_name,
-            Clients.last_name,
-            Clients.phone,
-            Tracks.name,
+            Clients.client_first_name,
+            Clients.client_last_name,
+            Clients.client_phone,
+            Tracks.track_name,
             Transactions.status,
             Transactions.date_time,
             Transactions.phone_num,
             Transactions.sim_num,
             Transactions.comment)
-        q = q.join(Tracks, (Clients, Clients.id == Transactions.client_id))
-        q = q.filter(Transactions.user_id == email)
+        q = q.join(Tracks, (Clients, Clients.client_id == Transactions.client_id))
+        q = q.filter(Transactions.email_user == email)
+        return q.all()
+
+    def status_sale(self):
+        q = self.session.query(Transactions.id,
+                               Transactions.date_time,
+                               Transactions.sim_num,
+                               Transactions.phone_num,
+                               Transactions.comment,
+                               Transactions.status,
+                               Transactions.credit_card_id,
+                               Transactions.bank_account_id,
+                               Users.user_first_name,
+                               Users.user_last_name,
+                               Clients.client_first_name,
+                               Clients.client_last_name,
+                               Clients.client_address,
+                               Clients.city,
+                               Clients.client_id,
+                               Tracks.company,
+                               Tracks.track_name)
+        q = q.join((Users, Users.user_email == Transactions.email_user),
+                   (Clients, Clients.client_id == Transactions.client_id),
+                   (Tracks, Tracks.id == Transactions.track_id))
+        print(q)
+        q = q.filter(Transactions.status == 0)
         return q.all()
 
 
 if __name__ == '__main__':
-    from tools.static import base_to_dict
-
-    tdb = TransactionsDB()
-    clients = ClientsDB()
-    print(base_to_dict(tdb.my_sale('yakir@ravtech.co.il')))
+    pass
+    # DB(Clients).create_all_tables()
+    # GroupsDB().set('ישיפון')
+    # UsersDB().set(1, 'yakir@ravtech.co.il', '1q2w3e4r', 'יקיר', 'צוברי', '0527168254')
+    # TracksDB().set('cellcom', 29, 'ללא הגבלה', 'כשר ללא הגבלה', True)
+    # ClientsDB().set('302637350', 'שלום', 'חלפון', 'הנורית 5', 'השרון', '0506615048')
+    # t = TransactionsDB().set('yakir@ravtech.co.il', 1, '302637350', datetime.now(), '987654321', '0502222222')
+    # print(base_to_dict(TransactionsDB().status_sale()))
+    # CreditCardDB().set('223366683', '741258963', '03', '21', '123')
+    # TransactionsDB().update(1, dict(credit_card_id=1))
+    # TransactionsDB().update(1, dict(status=0))
