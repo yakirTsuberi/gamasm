@@ -168,7 +168,7 @@
                 <h4 class="modal-title">לפני שמסיימים...</h4>
             </div>
             <div class="modal-body">
-                <p>נא מלא מספר לקוח וטלפון(אם המספר חדש)</p>
+                <p>נא מלא מספר לקוח וטלפון (אם המספר חדש)</p>
                 <label>מספר לקוח:
                     <input type="text" id="transaction_client" class="form-control" placeholder="מספר לקוח">
                 </label>
@@ -236,14 +236,14 @@
     var status_sale = {};
 
     function update_status(id, values) {
-        $.post('/api/update_status', {'id': id, 'values': JSON.stringify(values)}, function (data, status) {
+        $.post('/api/admin/update_status', {'id': id, 'values': JSON.stringify(values)}, function (data, status) {
             console.log(data);
             fill_status_sale()
         })
     }
 
     function remove_sale(id) {
-        $.post('/api/remove_sale', {'id': id}, function (data, status) {
+        $.post('/api/admin/remove_sale', {'id': id}, function (data, status) {
             console.log(data);
             fill_status_sale()
         })
@@ -319,6 +319,9 @@
                     if ('card_number' in payment) {
                         tr2.append($('<td>').html('מספר כרטיס: ' + payment.card_number + '<br>' + 'cvv: ' + payment.cvv + '<br>' + 'חודש: ' + payment.month + '<br>' + 'שנה: ' + payment.year))
                     }
+                    else if ('account_num' in payment) {
+                        tr2.append($('<td>').html('מספר חשבון: ' + payment.account_num + '<br>' + 'בנק: ' + payment.bank_num + '<br>' + 'סניף: ' + payment.brunch))
+                    }
                 }
                 tr2.appendTo(tbody);
                 tr1.click(function () {
@@ -334,7 +337,8 @@
     }
 
     fill_status_sale()
-
+</script>
+<script>
 
 </script>
 </body>

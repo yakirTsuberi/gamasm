@@ -14,13 +14,6 @@ app.secret_key = SECRET
 
 @app.route('/api/admin')
 def admin():
-    status_sale = TransactionsDB().status_sale()
-    payments = {}
-    for p in status_sale:
-        if p.credit_card_id is not None:
-            payments[p.id] = CreditCardDB().get(p.credit_card_id)
-        elif p.bank_account_id is not None:
-            payments[p.id] = CreditCardDB().get(p.credit_card_id)
     return render_template('admin.html')
 
 
@@ -37,14 +30,14 @@ def status_sale():
                       ensure_ascii=False).encode()
 
 
-@app.route('/api/update_status', methods=['POST'])
+@app.route('/api/admin/update_status', methods=['POST'])
 def update_status():
     print(request.form)
     TransactionsDB().update(int(request.form.get('id')), json.loads(request.form.get('values')))
     return json.dumps({'response': 'success'})
 
 
-@app.route('/api/remove_sale', methods=['POST'])
+@app.route('/api/admin/remove_sale', methods=['POST'])
 def remove_sale():
     print(request.form)
     return json.dumps({'response': 'success'})
