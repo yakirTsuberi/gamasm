@@ -11,7 +11,7 @@
     <ul class="nav nav-tabs">
         <li class="active"><a href="#1" data-toggle="tab">מצב מכירות</a></li>
         <li><a href="#2" data-toggle="tab">מידע כללי</a></li>
-        <li><a href="#3" data-toggle="tab">קבוצות וסוכנים</a></li>
+        <li><a href="#3" data-toggle="tab" id="groups_and_users">קבוצות וסוכנים</a></li>
         <li><a href="#4" data-toggle="tab">לקוחות</a></li>
         <li><a href="#5" data-toggle="tab">מסלולים</a></li>
     </ul>
@@ -107,7 +107,7 @@
 
     </div>
 </div>
-<div class="modal fade" id="editModal" role="dialog">
+<div class="modal fade" id="editStatusSaleModal" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
@@ -162,6 +162,74 @@
 
     </div>
 </div>
+
+<div class="modal fade" id="editUserModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">עריכה</h4>
+            </div>
+            <div class="modal-body">
+                <p>מלא את השדות שברצונך לערוך</p>
+                <label>אימייל:
+                    <input type="text" id="user_email" class="form-control" placeholder="אימייל">
+                </label>
+                <label>שם:
+                    <input type="text" id="user_first_name" class="form-control" placeholder="שם">
+                </label>
+                <label>משפחה:
+                    <input type="text" id="user_last_name" placeholder="משפחה" class="form-control">
+                </label>
+                <label>טלפון:
+                    <input type="text" id="user_phone" placeholder="משפחה" class="form-control">
+                </label>
+                <br>
+                <button id="remove_user" type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="editUserModalSave">שמור</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תשמור</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="modal fade" id="createUserModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">סוכן חדש</h4>
+            </div>
+            <div class="modal-body">
+                <p>מלא את השדות</p>
+                <label>אימייל:
+                    <input type="text" id="new_user_email" class="form-control" placeholder="אימייל">
+                </label>
+                <label>שם:
+                    <input type="text" id="new_user_first_name" class="form-control" placeholder="שם">
+                </label>
+                <label>משפחה:
+                    <input type="text" id="new_user_last_name" placeholder="משפחה" class="form-control">
+                </label>
+                <label>טלפון:
+                    <input type="text" id="new_user_phone" placeholder="טלפון" class="form-control">
+                </label>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="newUserModalSave">הוסף</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תוסיף</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://use.fontawesome.com/8ebd76e5c6.js"></script>
@@ -176,14 +244,14 @@
             remove_sale(bookId);
         });
     });
-    var editModal = $('#editModal');
-    editModal.on('show.bs.modal', function (e) {
+    var editStatusSaleModal = $('#editStatusSaleModal');
+    editStatusSaleModal.on('show.bs.modal', function (e) {
         var bookId = $(e.relatedTarget).data('book-id');
         $(e.currentTarget).find('a[id="modalSave"]').click(function () {
             var sim_num = $(e.currentTarget).find('#sim_num').val();
             var phone_num = $(e.currentTarget).find('#phone_num').val();
             var comment = $(e.currentTarget).find('#comment').val();
-            editModal.modal('hide');
+            editStatusSaleModal.modal('hide');
             var values = {};
             if (sim_num) {
                 values['sim_num'] = sim_num;
@@ -279,7 +347,7 @@
                                     'class': 'btn btn-primary',
                                     'data-book-id': s.id,
                                     'data-toggle': 'modal',
-                                    'data-target': '#editModal'
+                                    'data-target': '#editStatusSaleModal'
                                 })
                                     .append($('<i>').attr({'class': "fa fa-pencil", 'aria-hidden': "true"}))
                                     .click(function () {
@@ -317,28 +385,159 @@
     fill_status_sale()
 </script>
 <script>
+    var bookId;
+    var editUserModal = $('#editUserModal');
+    editUserModal.on('show.bs.modal', function (e) {
+        bookId = $(e.relatedTarget).data('book-id');
+    });
+
+    $('#remove_user').click(function () {
+        $.post('/api/admin/remove_user', {'id': bookId}, function (data, status) {
+            editUserModal.modal('hide');
+            fill_groups_and_users()
+        })
+    });
+
+    $('#editUserModalSave').click(function () {
+        var user_email = $('#user_email').val();
+        var user_first_name = $('#user_first_name').val();
+        var user_last_name = $('#user_last_name').val();
+        var user_phone = $('#user_phone').val();
+        editUserModal.modal('hide');
+        var values = {};
+        if (user_email) {
+            values['user_email'] = user_email;
+        }
+        if (user_first_name) {
+            values['user_first_name'] = user_first_name;
+        }
+        if (user_last_name) {
+            values['user_last_name'] = user_last_name;
+        }
+        if (user_phone) {
+            values['user_phone'] = user_phone;
+        }
+        update_user(bookId, values);
+    });
+
+    function update_user(id, values) {
+        $.post('/api/admin/update_user', {'id': id, 'values': JSON.stringify(values)}, function (data, status) {
+            console.log(data);
+            fill_groups_and_users()
+        })
+    }
+
+    var createUserModal = $('#createUserModal');
+
     var groups_and_users = {};
+
+    function create_users_table(g, data) {
+        console.log(data);
+        var table = $('<table>').attr('class', 'table table-hover');
+        var tbody = $('<tbody>');
+        $(data).each(function (i, item) {
+            tbody.append($('<tr>').append(
+                $('<td>').text(item.user_email),
+                $('<td>').text(item.user_first_name),
+                $('<td>').text(item.user_last_name),
+                $('<td>').text(item.user_phone),
+                $('<td>').html($('<button>')
+                    .attr({
+                        'class': 'btn btn-primary',
+                        'data-book-id': item.id,
+                        'data-toggle': 'modal',
+                        'data-target': '#editUserModal'
+                    })
+                    .click(function () {
+                        $('#user_email').val(item.user_email);
+                        $('#user_first_name').val(item.user_first_name);
+                        $('#user_last_name').val(item.user_last_name);
+                        $('#user_phone').val(item.user_phone);
+                    })
+                    .html($('<i>').attr({'class': "fa fa-pencil", 'aria-hidden': "true"})))
+            ))
+        });
+        table.append(
+            $('<thead>').html($('<tr>').append(
+                $('<th>').text('אימייל'),
+                $('<th>').text('שם'),
+                $('<th>').text('משפחה'),
+                $('<th>').text('טלפון'),
+                $('<th>').text('עריכה'))),
+            tbody);
+        return $('<div>').append($('<button>').attr('class', 'btn btn-success').text('הוסף סוכן').click(
+            function () {
+                console.log(g);
+                create_user(g)
+            }
+        ), table)
+    }
+
+    function create_user(group_name) {
+        createUserModal.modal('show');
+        $('#newUserModalSave').click(function () {
+            var values = {};
+
+            var new_user_email = $('#new_user_email').val();
+            var new_user_first_name = $('#new_user_first_name').val();
+            var new_user_last_name = $('#new_user_last_name').val();
+            var new_user_phone = $('#new_user_phone').val();
+
+            if (new_user_email) {
+                values['user_email'] = new_user_email
+            }
+            else {
+                return
+            }
+            if (new_user_first_name) {
+                values['user_first_name'] = new_user_first_name
+            }
+            else {
+                return
+            }
+            if (new_user_last_name) {
+                values['user_last_name'] = new_user_last_name
+            }
+            else {
+                return
+            }
+            if (new_user_phone) {
+                values['user_phone'] = new_user_phone;
+            }
+
+            values['group_name'] = group_name;
+            $.post('/api/admin/create_user', values, function (data, status) {
+                console.log(data)
+            });
+            createUserModal.modal('hide');
+            fill_groups_and_users();
+        })
+
+    }
 
     function fill_groups_and_users() {
         $.get('/api/admin/groups_and_users', function (data, status) {
             groups_and_users = $.parseJSON(data);
-            console.log(status_sale);
+            console.log(groups_and_users);
             var groups = $('#groups');
             groups.empty();
-            var users = $('#users').html($('<div>').attr('class', 'tab-pane active')).find('div');
-            $(groups_and_users).each(function (i, g) {
-                groups.append($('<li>').append($('<a>').text(Object.keys(g)).click(function () {
-                    $(this).parent().attr('class', 'active');
-                    users.html($('<h3>').text(g[0].user_phone))
-                })))
-            });
+            var users = $('#users');
+            users.empty();
+            for (var g in groups_and_users) {
+                groups.append($('<li>').html($('<a>').attr({'href': '#' + g, 'data-toggle': 'tab'}).text(g)));
+                users.append($('<div>').attr({
+                    'class': 'tab-pane',
+                    'id': g
+                }).append(create_users_table(g, groups_and_users[g])))
+            }
             groups.find('li:first-child').attr('class', 'active');
-            var first_group = groups_and_users[Object.keys(groups_and_users)[0]];
-            users.html($('<h3>').text(first_group[0].user_phone))
+            users.find('div:first-child').attr('class', 'tab-pane active');
         })
     }
 
-    fill_groups_and_users()
+    $('#groups_and_users').one('click', function () {
+        fill_groups_and_users()
+    })
 </script>
 </body>
 </html>

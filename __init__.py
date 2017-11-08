@@ -36,9 +36,40 @@ def groups_and_users():
     groups = GroupsDB().all()
     print(groups)
     for group in groups:
-        result[group.group_name] = base_to_dict(UsersDB().all(group.id))
+        users = base_to_dict(UsersDB().all(group.id))
+        for user in users:
+            del user['user_password']
+        result[group.group_name] = users
     print(result)
     return json.dumps(result, ensure_ascii=False).encode()
+
+
+@app.route('/api/admin/update_user', methods=['POST'])
+def update_user():
+    print(request.form)
+    UsersDB().update(int(request.form.get('id')), json.loads(request.form.get('values')))
+    return json.dumps({'response': 'success'})
+
+
+@app.route('/api/admin/remove_user', methods=['POST'])
+def remove_user():
+    print(request.form)
+    UsersDB().delete(int(request.form.get('id')))
+    return json.dumps({'response': 'success'})
+
+
+@app.route('/api/admin/create_user', methods=['POST'])
+def create_user():
+    print(request.form, request.form.get('user_phone'))
+    group_id = GroupsDB().get(group_name=request.form.get('group_name')).id
+
+    UsersDB().set(group_id=group_id, user_email=request.form.get('user_email'),
+                  user_password='#123',
+                  user_first_name=request.form.get('user_first_name'),
+                  user_last_name=request.form.get('user_last_name'),
+                  user_phone=request.form.get('user_phone'))
+
+    return json.dumps({'response': 'success'})
 
 
 @app.route('/api/admin/update_status', methods=['POST'])

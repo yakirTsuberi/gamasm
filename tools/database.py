@@ -181,8 +181,13 @@ class GroupsDB(DB):
     def all(self):
         return self.session.query(*self._class.__table__.columns).all()
 
-    def get(self, group_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.id == group_id).first()
+    def get(self, group_id=None, group_name=None):
+        q = self.session.query(*self._class.__table__.columns)
+        if group_id is not None:
+            q = q.filter(self._class.id == group_id)
+        elif group_name is not None:
+            q = q.filter(self._class.group_name == group_name)
+        return q.first()
 
 
 class UsersDB(DB):
@@ -202,17 +207,17 @@ class UsersDB(DB):
             logging.error(e)
             self.session.rollback()
 
-    def update(self, email, values):
+    def update(self, user_id, values):
         try:
-            self.session.query(self._class).filter(self._class.email == email.lower()).update(values)
+            self.session.query(self._class).filter(self._class.id == user_id).update(values)
             self.session.commit()
         except Exception as e:
             logging.error(e)
             self.session.rollback()
 
-    def delete(self, email):
+    def delete(self, user_id):
         try:
-            self.session.query(self._class).filter(self._class.email == email.lower()).delete()
+            self.session.query(self._class).filter(self._class.id == user_id).delete()
             self.session.commit()
         except Exception as e:
             logging.error(e)
@@ -514,8 +519,22 @@ class TransactionsDB(DB):
         return q.all()
 
 
+def _create_db():
+    groups = GroupsDB()
+    groups.create_all_tables()
+    groups.set('ישיפון')
+    groups.set('טסט')
+    group_a = groups.get(group_name='ישיפון')
+    group_b = groups.get(group_name='טסט')
+
+    users = UsersDB()
+    users.set(group_a.id, 'yakir@ravtech.co.il', '1q2w3e4r', 'יקיר', 'צוברי', '0527168254')
+    users.set(group_b.id, 'moshe@ravtech.co.il', '1q2w3e4r', 'משה', 'דחבש', '0527174851')
+
+
 if __name__ == '__main__':
     pass
+    # _create_db()
     # DB(Clients).create_all_tables()
     # print(GroupsDB().all())
     # GroupsDB().set('ישיפון')
