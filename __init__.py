@@ -5,8 +5,8 @@ from flask import Flask, request, render_template
 import jwt
 
 sys.path.insert(0, "/var/www/api.gama-sm.com/gamasm/tools/")
-from tools.database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
-from tools.static import base_to_dict, datetime_handler
+from gamasm.tools.database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
+from gamasm.tools.static import base_to_dict, datetime_handler
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
 
