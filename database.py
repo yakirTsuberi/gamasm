@@ -1,14 +1,11 @@
-from datetime import datetime
 import logging
 from pathlib import Path
 
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, ForeignKey, DateTime, Date
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-from tools.static import base_to_dict
-
-DB_PATH = 'sqlite:///' + str(Path(__file__).parent.parent / 'data.db')
+DB_PATH = 'sqlite:///' + str(Path(__file__).parent / 'data.db')
 Base = declarative_base()
 
 
