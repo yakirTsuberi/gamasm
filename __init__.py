@@ -3,8 +3,8 @@ import json
 from flask import Flask, request, render_template
 import jwt
 
-from tools.database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
-from tools.static import base_to_dict, datetime_handler
+from .tools.database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
+from .tools.static import base_to_dict, datetime_handler
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
 
