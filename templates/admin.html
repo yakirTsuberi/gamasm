@@ -40,6 +40,11 @@
         <div class="tab-pane" id="3">
             <h3>קבוצות וסוכנים</h3>
             <div class="col-md-3">
+                <div>
+                    <button type="button" data-toggle="modal" data-target="#createGroupModal" class="btn btn-success"
+                            style="margin-bottom: 10px">הוסף קבוצה
+                    </button>
+                </div>
                 <ul class="nav nav-pills nav-stacked" id="groups"></ul>
             </div>
             <div class="col-md-9 tab-content" id="users"></div>
@@ -52,12 +57,12 @@
             <div class="col-md-3">
                 <ul class="nav nav-pills nav-stacked">
                     <li class="active"><a href="#5_1" data-toggle="tab">סלקום</a></li>
-                    <li><a href="#5_2" data-toggle="tab">פרטנר</a></li>
-                    <li><a href="#5_3" data-toggle="tab">פלאפון</a></li>
-                    <li><a href="#5_4" data-toggle="tab">012</a></li>
-                    <li><a href="#5_5" data-toggle="tab">הוט</a></li>
-                    <li><a href="#5_6" data-toggle="tab">גולן</a></li>
-                    <li><a href="#5_7" data-toggle="tab">רמי לוי</a></li>
+                    <li><a href="#partner" data-toggle="tab">פרטנר</a></li>
+                    <li><a href="#pelephon" data-toggle="tab">פלאפון</a></li>
+                    <li><a href="#012" data-toggle="tab">012</a></li>
+                    <li><a href="#hot" data-toggle="tab">הוט</a></li>
+                    <li><a href="#golan" data-toggle="tab">גולן</a></li>
+                    <li><a href="#rami_levi" data-toggle="tab">רמי לוי</a></li>
                 </ul>
             </div>
             <div class="col-md-9 tab-content">
@@ -229,6 +234,30 @@
 
     </div>
 </div>
+<div class="modal fade" id="createGroupModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">סוכן חדש</h4>
+            </div>
+            <div class="modal-body">
+                <p>מלא את השדות</p>
+                <label>שם קבוצה:
+                    <input type="text" id="new_group_name" class="form-control" placeholder="שם">
+                </label>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="newGroupModalSave">הוסף</a>
+                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תוסיף</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -428,6 +457,15 @@
     }
 
     var createUserModal = $('#createUserModal');
+
+    $('#newGroupModalSave').click(function () {
+            var group_name = $('#new_group_name').val();
+            $('#createGroupModal').modal('hide');
+            $.post('/api/admin/crate_group', {group_name: group_name}, function () {
+                fill_groups_and_users()
+            });
+        }
+    );
 
     var groups_and_users = {};
 

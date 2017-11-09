@@ -1,10 +1,11 @@
 import json
+from distutils.util import grok_environment_error
 
 import jwt
 from flask import Flask, request, render_template
 
-from .database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
-from .static import base_to_dict, datetime_handler
+from database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
+from static import base_to_dict, datetime_handler
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
 
@@ -19,15 +20,22 @@ def admin():
 
 @app.route('/api/admin/status_sale')
 def status_sale():
-    status_sale = TransactionsDB().status_sale()
+    _status_sale = TransactionsDB().status_sale()
     payments = {}
-    for p in status_sale:
+    for p in _status_sale:
         if p.credit_card_id is not None:
             payments[p.id] = base_to_dict(CreditCardDB().get(p.credit_card_id))
         elif p.bank_account_id is not None:
             payments[p.id] = base_to_dict(BankAccountDB().get(p.credit_card_id))
-    return json.dumps(dict(status_sale=base_to_dict(status_sale), payments=payments), default=datetime_handler,
+    return json.dumps(dict(status_sale=base_to_dict(_status_sale), payments=payments), default=datetime_handler,
                       ensure_ascii=False).encode()
+
+
+@app.route('/api/admin/update_status', methods=['POST'])
+def update_status():
+    print(request.form)
+    TransactionsDB().update(int(request.form.get('id')), json.loads(request.form.get('values')))
+    return json.dumps({'response': 'success'})
 
 
 @app.route('/api/admin/groups_and_users')
@@ -72,10 +80,11 @@ def create_user():
     return json.dumps({'response': 'success'})
 
 
-@app.route('/api/admin/update_status', methods=['POST'])
-def update_status():
-    print(request.form)
-    TransactionsDB().update(int(request.form.get('id')), json.loads(request.form.get('values')))
+@app.route('/api/admin/crate_group', methods=['POST'])
+def crate_group():
+    group_name = request.form.get('group_name')
+    print(group_name)
+    GroupsDB().set(group_name=group_name)
     return json.dumps({'response': 'success'})
 
 
