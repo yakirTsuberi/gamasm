@@ -1,11 +1,10 @@
 import json
-from distutils.util import grok_environment_error
 
 import jwt
 from flask import Flask, request, render_template
 
 from database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
-from static import base_to_dict, datetime_handler
+from config import base_to_dict, datetime_handler
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
 
@@ -16,6 +15,11 @@ app.secret_key = SECRET
 @app.route('/api/admin')
 def admin():
     return render_template('admin.html')
+
+
+@app.route('/')
+def tmp():
+    return render_template('tmp.html')
 
 
 @app.route('/api/admin/status_sale')
@@ -77,6 +81,13 @@ def create_user():
                   user_last_name=request.form.get('user_last_name'),
                   user_phone=request.form.get('user_phone'))
 
+    return json.dumps({'response': 'success'})
+
+
+@app.route('/api/admin/create_track', methods=['POST'])
+def create_track():
+    form = request.form
+    # TracksDB().set(form.get('company'))
     return json.dumps({'response': 'success'})
 
 

@@ -107,7 +107,7 @@ class DB:
         self._class = __class
 
     def create_all_tables(self):
-        Base.metadata.create_all(self.engine, checkfirst=True)
+        Base().metadata.create_all(self.engine, checkfirst=True)
 
 
 class AdminDB(DB):
@@ -465,14 +465,14 @@ class TransactionsDB(DB):
             logging.error(e)
             self.session.rollback()
 
-    def all(self, user_id=None):
+    def all(self, client_id=None):
         q = self.session.query(*self._class.__table__.columns)
-        if user_id is not None:
-            q = q.filter(self._class.user_id == user_id)
+        if client_id is not None:
+            q = q.filter(self._class.client_id == client_id)
         return q.all()
 
-    def get(self, group_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.id == group_id).first()
+    def get(self, transactions_id):
+        return self.session.query(*self._class.__table__.columns).filter(self._class.id == transactions_id).first()
 
     def my_sale(self, email):
         q = self.session.query(

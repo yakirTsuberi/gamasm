@@ -1,38 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="app">
 <head>
     <meta charset="UTF-8">
-    <title>Admin</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <title>מנהל</title>
+    <link rel="stylesheet" href="/static/src/bootstrap/css/bootstrap.min.css">
+    <style>
+        .table-responsive {
+            border-top: none;
+        }
+    </style>
 </head>
-<body style="direction: rtl">
-<div class="container"><h1 style="text-align: center">- Gama S.M. Admin -</h1></div>
-<div id="main_tabs" class="container">
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#1" data-toggle="tab">מצב מכירות</a></li>
-        <li><a href="#2" data-toggle="tab">מידע כללי</a></li>
-        <li><a href="#3" data-toggle="tab" id="groups_and_users">קבוצות וסוכנים</a></li>
-        <li><a href="#4" data-toggle="tab">לקוחות</a></li>
-        <li><a href="#5" data-toggle="tab">מסלולים</a></li>
+<body ng-controller="MainController as mc">
+<div class="container"><h1 style="text-align: center">- Gama S.M. -</h1></div>
+<div id="main_tabs" class="container" style="direction: rtl">
+    <ul class="nav nav-tabs nav-tabs-responsive">
+        <li class="active"><a href="#1" data-toggle="tab"><span class="text">מצב מכירות</span></a></li>
+        <li class="next"><a href="#2" data-toggle="tab"><span class="text">מידע כללי</span></a></li>
+        <li><a href="#3" data-toggle="tab" id="groups_and_users"><span class="text">קבוצות וסוכנים</span></a></li>
+        <li><a href="#4" data-toggle="tab"><span class="text">לקוחות</span></a></li>
+        <li><a href="#5" data-toggle="tab"><span class="text">מסלולים</span></a></li>
     </ul>
 
     <div class="tab-content">
         <div class="tab-pane active" id="1">
-            <h3>מצב מכירות</h3>
-            <table class="table table-hover" id="status_sale">
-                <thead>
-                <tr>
-                    <th class="text-right">תאריך</th>
-                    <th class="text-right">סוכן</th>
-                    <th class="text-right">לקוח</th>
-                    <th class="text-right">מסלול</th>
-                    <th class="text-right">פרטים</th>
-                </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
+            <div class="table-responsive" ng-include="'/static/html/status_sale.html'"></div>
         </div>
         <div class="tab-pane" id="2">
             <h3>מידע כללי</h3>
@@ -41,13 +32,12 @@
             <h3>קבוצות וסוכנים</h3>
             <div class="col-md-3">
                 <div>
-                    <button type="button" data-toggle="modal" data-target="#createGroupModal" class="btn btn-success"
-                            style="margin-bottom: 10px">הוסף קבוצה
+                    <button>הוסף קבוצה
                     </button>
                 </div>
-                <ul class="nav nav-pills nav-stacked" id="groups"></ul>
+                <ul class="nav nav-pills nav-stacked"></ul>
             </div>
-            <div class="col-md-9 tab-content" id="users"></div>
+            <div class="col-md-9 tab-content"></div>
         </div>
         <div class="tab-pane" id="4">
             <h3>לקוחות</h3>
@@ -56,7 +46,7 @@
             <h3>מסלולים</h3>
             <div class="col-md-3">
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#5_1" data-toggle="tab">סלקום</a></li>
+                    <li class="active"><a href="#cellcom" data-toggle="tab">סלקום</a></li>
                     <li><a href="#partner" data-toggle="tab">פרטנר</a></li>
                     <li><a href="#pelephon" data-toggle="tab">פלאפון</a></li>
                     <li><a href="#012" data-toggle="tab">012</a></li>
@@ -66,516 +56,39 @@
                 </ul>
             </div>
             <div class="col-md-9 tab-content">
-                <div class="tab-pane active" id="5_1">
-                    <h3>add clearfix to tab-content (see the css)1</h3>
+                <div class="tab-pane active" id="cellcom">
+                    <h4>סלקום</h4>
                 </div>
-                <div class="tab-pane" id="5_2">
-                    <h3>add clearfix to tab-content (see the css)2</h3>
+                <div class="tab-pane" id="partner">
+                    <h4>פרטנר</h4>
                 </div>
-                <div class="tab-pane" id="5_3">
-                    <h3>add clearfix to tab-content (see the css)3</h3>
+                <div class="tab-pane" id="pelephon">
+                    <h4>פלאפון</h4>
                 </div>
-                <div class="tab-pane" id="5_4">
-                    <h3>add clearfix to tab-content (see the css)4</h3>
+                <div class="tab-pane" id="012">
+                    <h4>012 מובייל</h4>
                 </div>
-                <div class="tab-pane" id="5_5">
-                    <h3>add clearfix to tab-content (see the css)5</h3>
+                <div class="tab-pane" id="hot">
+                    <h4>הוט מובייל</h4>
                 </div>
-                <div class="tab-pane" id="5_6">
-                    <h3>add clearfix to tab-content (see the css)6</h3>
+                <div class="tab-pane" id="golan">
+                    <h4>גולן טלקום</h4>
                 </div>
-                <div class="tab-pane" id="5_7">
-                    <h3>add clearfix to tab-content (see the css)7</h3>
+                <div class="tab-pane" id="rami_levi">
+                    <h4>רמי לוי</h4>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
-<div class="modal fade" id="deleteModal" role="dialog">
-    <div class="modal-dialog">
 
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">מחק מכירה</h4>
-            </div>
-            <div class="modal-body">
-                <p>בטוח שברצונך למחוק?</p>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-danger" id="delete">מחק</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תמחק</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-<div class="modal fade" id="editStatusSaleModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">עריכה</h4>
-            </div>
-            <div class="modal-body">
-                <p>מלא את השדות שברצונך לערוך</p>
-                <label>מספר סים:
-                    <input type="text" id="sim_num" class="form-control" placeholder="מספר סים">
-                </label>
-                <label>מספר טלפון:
-                    <input type="text" id="phone_num" class="form-control" placeholder="מספר טלפון">
-                </label>
-                <label>הערה:
-                    <textarea id="comment" placeholder="הערה" class="form-control"></textarea>
-                </label>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" id="modalSave">שמור</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תשמור</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-<div class="modal fade" id="successModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">לפני שמסיימים...</h4>
-            </div>
-            <div class="modal-body">
-                <p>נא מלא מספר לקוח וטלפון (אם המספר חדש)</p>
-                <label>מספר לקוח:
-                    <input type="text" id="transaction_client" class="form-control" placeholder="מספר לקוח">
-                </label>
-                <label>מספר טלפון:
-                    <input type="text" id="new_phone_num" class="form-control" placeholder="מספר טלפון">
-                </label>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" id="modalEnd">שלח</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תשלח</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<div class="modal fade" id="editUserModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">עריכה</h4>
-            </div>
-            <div class="modal-body">
-                <p>מלא את השדות שברצונך לערוך</p>
-                <label>אימייל:
-                    <input type="text" id="user_email" class="form-control" placeholder="אימייל">
-                </label>
-                <label>שם:
-                    <input type="text" id="user_first_name" class="form-control" placeholder="שם">
-                </label>
-                <label>משפחה:
-                    <input type="text" id="user_last_name" placeholder="משפחה" class="form-control">
-                </label>
-                <label>טלפון:
-                    <input type="text" id="user_phone" placeholder="משפחה" class="form-control">
-                </label>
-                <br>
-                <button id="remove_user" type="button" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" id="editUserModalSave">שמור</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תשמור</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-<div class="modal fade" id="createUserModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">סוכן חדש</h4>
-            </div>
-            <div class="modal-body">
-                <p>מלא את השדות</p>
-                <label>אימייל:
-                    <input type="text" id="new_user_email" class="form-control" placeholder="אימייל">
-                </label>
-                <label>שם:
-                    <input type="text" id="new_user_first_name" class="form-control" placeholder="שם">
-                </label>
-                <label>משפחה:
-                    <input type="text" id="new_user_last_name" placeholder="משפחה" class="form-control">
-                </label>
-                <label>טלפון:
-                    <input type="text" id="new_user_phone" placeholder="טלפון" class="form-control">
-                </label>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" id="newUserModalSave">הוסף</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תוסיף</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-<div class="modal fade" id="createGroupModal" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">סוכן חדש</h4>
-            </div>
-            <div class="modal-body">
-                <p>מלא את השדות</p>
-                <label>שם קבוצה:
-                    <input type="text" id="new_group_name" class="form-control" placeholder="שם">
-                </label>
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-primary" id="newGroupModalSave">הוסף</a>
-                <button type="button" class="btn btn-success" data-dismiss="modal">לא, אל תוסיף</button>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://use.fontawesome.com/8ebd76e5c6.js"></script>
-
-<script>
-    var deleteModal = $('#deleteModal');
-    deleteModal.on('show.bs.modal', function (e) {
-        var bookId = $(e.relatedTarget).data('book-id');
-        $(e.currentTarget).find('a[id="delete"]').click(function () {
-            console.log(bookId);
-            deleteModal.modal('hide');
-            remove_sale(bookId);
-        });
-    });
-    var editStatusSaleModal = $('#editStatusSaleModal');
-    editStatusSaleModal.on('show.bs.modal', function (e) {
-        var bookId = $(e.relatedTarget).data('book-id');
-        $(e.currentTarget).find('a[id="modalSave"]').click(function () {
-            var sim_num = $(e.currentTarget).find('#sim_num').val();
-            var phone_num = $(e.currentTarget).find('#phone_num').val();
-            var comment = $(e.currentTarget).find('#comment').val();
-            editStatusSaleModal.modal('hide');
-            var values = {};
-            if (sim_num) {
-                values['sim_num'] = sim_num;
-            }
-            if (phone_num) {
-                values['phone_num'] = phone_num;
-            }
-            if (comment) {
-                values['comment'] = comment;
-            }
-            update_status(bookId, values);
-        });
-    });
-    var successModal = $('#successModal');
-    successModal.on('show.bs.modal', function (e) {
-        var bookId = $(e.relatedTarget).data('book-id');
-        $(e.currentTarget).find('a[id="modalEnd"]').click(function () {
-            var transaction_client = $(e.currentTarget).find('#transaction_client').val();
-            var phone_num = $(e.currentTarget).find('#new_phone_num').val();
-            if (!transaction_client || !phone_num) {
-                return
-            }
-            console.log(bookId);
-            successModal.modal('hide');
-            update_status(bookId, {'status': 1})
-        });
-    });
-    var status_sale = {};
-
-    function update_status(id, values) {
-        $.post('/api/admin/update_status', {'id': id, 'values': JSON.stringify(values)}, function (data, status) {
-            console.log(data);
-            fill_status_sale()
-        })
-    }
-
-    function remove_sale(id) {
-        $.post('/api/admin/remove_sale', {'id': id}, function (data, status) {
-            console.log(data);
-            fill_status_sale()
-        })
-    }
-
-    function fill_status_sale() {
-        $.get('/api/admin/status_sale', function (data, status) {
-            status_sale = $.parseJSON(data);
-            console.log(status_sale);
-            var tbody = $('#status_sale').find('tbody');
-            tbody.empty();
-            $(status_sale.status_sale).each(function (i, s) {
-                var tr1 = $('<tr>').append(
-                    $('<td>').text(s.date_time),
-                    $('<td>').text(s.user_first_name + ' ' + s.user_last_name),
-                    $('<td>').text(s.client_first_name + ' ' + s.client_last_name),
-                    $('<td>').text(s.company),
-                    $('<td>').text(s.comment)
-                );
-                tr1.appendTo(tbody);
-                var tr2 = $('<tr>')
-                    .css({
-                        display: 'none',
-                        'background-color': '#5bc0de',
-                        color: 'white'
-                    });
-                tr2.append(
-                    $('<td>').html('מספר סים: ' + s.sim_num + '<br>' + 'מספר טלפון: ' + s.phone_num + '<br>')
-                        .append($('<div>').attr({'class': "btn-group", 'style': "margin-top: 10px"})
-                            .append(
-                                $('<button>').attr({
-                                    'class': 'btn btn-success',
-                                    'data-book-id': s.id,
-                                    'data-toggle': 'modal',
-                                    'data-target': '#successModal'
-                                })
-                                    .click(function () {
-                                        $('#new_phone_num').val(s.phone_num)
-                                    })
-                                    .append($('<i>').attr({'class': "fa fa-thumbs-o-up", 'aria-hidden': "true"})),
-                                $('<button>').attr('class', "btn btn-warning")
-                                    .append($('<i>').attr({'class': "fa fa-thumbs-o-down", 'aria-hidden': "true"}))
-                                    .click(function () {
-                                        update_status(s.id, {'status': 2})
-                                    }),
-                                $('<button>').attr({
-                                    'class': 'btn btn-danger',
-                                    'data-book-id': s.id,
-                                    'data-toggle': 'modal',
-                                    'data-target': '#deleteModal'
-                                })
-                                    .append($('<i>').attr({'class': "fa fa-trash-o", 'aria-hidden': "true"})),
-
-                                $('<button>').attr({
-                                    'class': 'btn btn-primary',
-                                    'data-book-id': s.id,
-                                    'data-toggle': 'modal',
-                                    'data-target': '#editStatusSaleModal'
-                                })
-                                    .append($('<i>').attr({'class': "fa fa-pencil", 'aria-hidden': "true"}))
-                                    .click(function () {
-                                        $('#sim_num').val(s.sim_num);
-                                        $('#phone_num').val(s.phone_num);
-                                        $('#comment').val(s.comment);
-                                    })
-                            )),
-                    $('<td>'),
-                    $('<td>').html('תעודת זהות: ' + ' ' + s.client_id + '<br>' + 'כתובת: ' + s.client_address + ' ' + s.city),
-                    $('<td>').text(s.track_name)
-                );
-                var payment = status_sale.payments[s.id];
-                if (payment) {
-                    if ('card_number' in payment) {
-                        tr2.append($('<td>').html('מספר כרטיס: ' + payment.card_number + '<br>' + 'cvv: ' + payment.cvv + '<br>' + 'חודש: ' + payment.month + '<br>' + 'שנה: ' + payment.year))
-                    }
-                    else if ('account_num' in payment) {
-                        tr2.append($('<td>').html('מספר חשבון: ' + payment.account_num + '<br>' + 'בנק: ' + payment.bank_num + '<br>' + 'סניף: ' + payment.brunch))
-                    }
-                }
-                tr2.appendTo(tbody);
-                tr1.click(function () {
-                    if (tr2.is(':visible')) {
-                        tr2.hide()
-                    }
-                    else {
-                        tr2.show()
-                    }
-                })
-            })
-        })
-    }
-
-    fill_status_sale()
-</script>
-<script>
-    var bookId;
-    var editUserModal = $('#editUserModal');
-    editUserModal.on('show.bs.modal', function (e) {
-        bookId = $(e.relatedTarget).data('book-id');
-    });
-
-    $('#remove_user').click(function () {
-        $.post('/api/admin/remove_user', {'id': bookId}, function (data, status) {
-            editUserModal.modal('hide');
-            fill_groups_and_users()
-        })
-    });
-
-    $('#editUserModalSave').click(function () {
-        var user_email = $('#user_email').val();
-        var user_first_name = $('#user_first_name').val();
-        var user_last_name = $('#user_last_name').val();
-        var user_phone = $('#user_phone').val();
-        editUserModal.modal('hide');
-        var values = {};
-        if (user_email) {
-            values['user_email'] = user_email;
-        }
-        if (user_first_name) {
-            values['user_first_name'] = user_first_name;
-        }
-        if (user_last_name) {
-            values['user_last_name'] = user_last_name;
-        }
-        if (user_phone) {
-            values['user_phone'] = user_phone;
-        }
-        update_user(bookId, values);
-    });
-
-    function update_user(id, values) {
-        $.post('/api/admin/update_user', {'id': id, 'values': JSON.stringify(values)}, function (data, status) {
-            console.log(data);
-            fill_groups_and_users()
-        })
-    }
-
-    var createUserModal = $('#createUserModal');
-
-    $('#newGroupModalSave').click(function () {
-            var group_name = $('#new_group_name').val();
-            $('#createGroupModal').modal('hide');
-            $.post('/api/admin/crate_group', {group_name: group_name}, function () {
-                fill_groups_and_users()
-            });
-        }
-    );
-
-    var groups_and_users = {};
-
-    function create_users_table(g, data) {
-        console.log(data);
-        var table = $('<table>').attr('class', 'table table-hover');
-        var tbody = $('<tbody>');
-        $(data).each(function (i, item) {
-            tbody.append($('<tr>').append(
-                $('<td>').text(item.user_email),
-                $('<td>').text(item.user_first_name),
-                $('<td>').text(item.user_last_name),
-                $('<td>').text(item.user_phone),
-                $('<td>').html($('<button>')
-                    .attr({
-                        'class': 'btn btn-primary',
-                        'data-book-id': item.id,
-                        'data-toggle': 'modal',
-                        'data-target': '#editUserModal'
-                    })
-                    .click(function () {
-                        $('#user_email').val(item.user_email);
-                        $('#user_first_name').val(item.user_first_name);
-                        $('#user_last_name').val(item.user_last_name);
-                        $('#user_phone').val(item.user_phone);
-                    })
-                    .html($('<i>').attr({'class': "fa fa-pencil", 'aria-hidden': "true"})))
-            ))
-        });
-        table.append(
-            $('<thead>').html($('<tr>').append(
-                $('<th>').text('אימייל'),
-                $('<th>').text('שם'),
-                $('<th>').text('משפחה'),
-                $('<th>').text('טלפון'),
-                $('<th>').text('עריכה'))),
-            tbody);
-        return $('<div>').append($('<button>').attr('class', 'btn btn-success').text('הוסף סוכן').click(
-            function () {
-                console.log(g);
-                create_user(g)
-            }
-        ), table)
-    }
-
-    function create_user(group_name) {
-        createUserModal.modal('show');
-        $('#newUserModalSave').click(function () {
-            var values = {};
-
-            var new_user_email = $('#new_user_email').val();
-            var new_user_first_name = $('#new_user_first_name').val();
-            var new_user_last_name = $('#new_user_last_name').val();
-            var new_user_phone = $('#new_user_phone').val();
-
-            if (new_user_email) {
-                values['user_email'] = new_user_email
-            }
-            else {
-                return
-            }
-            if (new_user_first_name) {
-                values['user_first_name'] = new_user_first_name
-            }
-            else {
-                return
-            }
-            if (new_user_last_name) {
-                values['user_last_name'] = new_user_last_name
-            }
-            else {
-                return
-            }
-            if (new_user_phone) {
-                values['user_phone'] = new_user_phone;
-            }
-
-            values['group_name'] = group_name;
-            $.post('/api/admin/create_user', values, function (data, status) {
-                console.log(data)
-            });
-            createUserModal.modal('hide');
-            fill_groups_and_users();
-        })
-
-    }
-
-    function fill_groups_and_users() {
-        $.get('/api/admin/groups_and_users', function (data, status) {
-            groups_and_users = $.parseJSON(data);
-            console.log(groups_and_users);
-            var groups = $('#groups');
-            groups.empty();
-            var users = $('#users');
-            users.empty();
-            for (var g in groups_and_users) {
-                groups.append($('<li>').html($('<a>').attr({'href': '#' + g, 'data-toggle': 'tab'}).text(g)));
-                users.append($('<div>').attr({
-                    'class': 'tab-pane',
-                    'id': g
-                }).append(create_users_table(g, groups_and_users[g])))
-            }
-            groups.find('li:first-child').attr('class', 'active');
-            users.find('div:first-child').attr('class', 'tab-pane active');
-        })
-    }
-
-    $('#groups_and_users').one('click', function () {
-        fill_groups_and_users()
-    })
-</script>
+<script src="/static/src/jquery-3.2.1.min.js"></script>
+<script src="/static/src/tether.min.js"></script>
+<script src="/static/src/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/src/brt/brt.js"></script>
+<script src="/static/src/angular.min.js"></script>
+<script src="/static/src/sortable.js"></script>
+<script src="/static/app.js"></script>
 </body>
 </html>
