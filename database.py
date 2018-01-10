@@ -120,31 +120,42 @@ class AdminDB(DB):
                                          admin_password=admin_password,
                                          permissions=permissions))
             self.session.commit()
+            return True
         except Exception as e:
             logging.error(e)
             self.session.rollback()
+            return False
 
-    def update(self, admin_id, values):
+    def update(self, _id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == admin_id).update(values)
+            self.session.query(self._class).filter(self._class.id == _id).update(values)
             self.session.commit()
+            return True
         except Exception as e:
             logging.error(e)
             self.session.rollback()
+            return False
 
-    def delete(self, admin_id):
+    def delete(self, _id):
         try:
-            self.session.query(self._class).filter(self._class.id == admin_id).delete()
+            self.session.query(self._class).filter(self._class.id == _id).delete()
             self.session.commit()
+            return True
         except Exception as e:
             logging.error(e)
             self.session.rollback()
+            return False
 
     def all(self):
         return self.session.query(*self._class.__table__.columns).all()
 
-    def get(self, admin_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.id == admin_id).first()
+    def get(self, _id=None):
+        q = self.session.query(*self._class.__table__.columns)
+        if _id is not None:
+            q = q.filter(self._class.id == _id)
+        if q.count() > 1 or _id is None:
+            return q.all()
+        return q.first()
 
 
 class GroupsDB(DB):
@@ -155,9 +166,11 @@ class GroupsDB(DB):
         try:
             self.session.add(self._class(group_name=group_name))
             self.session.commit()
+            return True
         except Exception as e:
             logging.error(e)
             self.session.rollback()
+            return False
 
     def update(self, group_id, values):
         try:
@@ -178,12 +191,15 @@ class GroupsDB(DB):
     def all(self):
         return self.session.query(*self._class.__table__.columns).all()
 
-    def get(self, group_id=None, group_name=None):
+    def get(self, id_or_name=None):
         q = self.session.query(*self._class.__table__.columns)
-        if group_id is not None:
-            q = q.filter(self._class.id == group_id)
-        elif group_name is not None:
-            q = q.filter(self._class.group_name == group_name)
+        if id_or_name is not None:
+            if id_or_name.isdigit():
+                q = q.filter(self._class.id == id_or_name)
+            else:
+                q = q.filter(self._class.group_name == id_or_name)
+        if q.count() > 1 or id_or_name is None:
+            return q.all()
         return q.first()
 
 
@@ -543,3 +559,4 @@ if __name__ == '__main__':
     # CreditCardDB().set('223366683', '741258963', '03', '21', '123')
     # TransactionsDB().update(1, dict(credit_card_id=1))
     # TransactionsDB().update(1, dict(status=0))
+    print(AdminDB().all())

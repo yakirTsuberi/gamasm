@@ -1,145 +1,66 @@
 import json
 
 import jwt
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify, abort
+from flask_restful import Resource, Api
 
-from database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB
-from config import base_to_dict, datetime_handler
+from database import UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB, AdminDB
+from config import base_to_dict, datetime_handler, verify_request
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
 
 app = Flask(__name__)
 app.secret_key = SECRET
 
-
-@app.route('/api/admin')
-def admin():
-    return render_template('admin.html')
+ADMINS_PARAMS = ['admin_email', 'admin_password', 'permissions']
+GROUPS_PARAMS = ['group_name']
 
 
-@app.route('/')
-def tmp():
-    return render_template('tmp.html')
+@app.route('/api/admins', methods=['GET', 'POST'])
+@app.route('/api/admins/<_id>', methods=['GET', 'PUT', 'DELETE'])
+def admins(_id=None):
+    db = AdminDB()
+    if request.method == 'GET':
+        q = db.get(_id) or []
+        return jsonify(base_to_dict(q))
+    if request.method == 'POST':
+        if verify_request(request, ADMINS_PARAMS):
+            params = request.json
+            status = db.set(params.get('admin_email'), params.get('admin_password'), params.get('permissions'))
+            if status:
+                return jsonify(status='success')
+    if request.method == 'PUT':
+        if verify_request(request, ADMINS_PARAMS):
+            params = request.json
+            status = db.update(_id, params)
+            if status:
+                return jsonify(status='success')
+    if request.method == 'DELETE':
+        status = db.delete(_id)
+        if status:
+            return jsonify(status='success')
+    return abort(400)
 
 
-@app.route('/api/admin/status_sale')
-def status_sale():
-    _status_sale = TransactionsDB().status_sale()
-    payments = {}
-    for p in _status_sale:
-        if p.credit_card_id is not None:
-            payments[p.id] = base_to_dict(CreditCardDB().get(p.credit_card_id))
-        elif p.bank_account_id is not None:
-            payments[p.id] = base_to_dict(BankAccountDB().get(p.credit_card_id))
-    return json.dumps(dict(status_sale=base_to_dict(_status_sale), payments=payments), default=datetime_handler,
-                      ensure_ascii=False).encode()
-
-
-@app.route('/api/admin/update_status', methods=['POST'])
-def update_status():
-    print(request.form)
-    TransactionsDB().update(int(request.form.get('id')), json.loads(request.form.get('values')))
-    return json.dumps({'response': 'success'})
-
-
-@app.route('/api/admin/groups_and_users')
-def groups_and_users():
-    result = {}
-    groups = GroupsDB().all()
-    print(groups)
-    for group in groups:
-        users = base_to_dict(UsersDB().all(group.id))
-        for user in users:
-            del user['user_password']
-        result[group.group_name] = users
-    print(result)
-    return json.dumps(result, ensure_ascii=False).encode()
-
-
-@app.route('/api/admin/update_user', methods=['POST'])
-def update_user():
-    print(request.form)
-    UsersDB().update(int(request.form.get('id')), json.loads(request.form.get('values')))
-    return json.dumps({'response': 'success'})
-
-
-@app.route('/api/admin/remove_user', methods=['POST'])
-def remove_user():
-    print(request.form)
-    UsersDB().delete(int(request.form.get('id')))
-    return json.dumps({'response': 'success'})
-
-
-@app.route('/api/admin/create_user', methods=['POST'])
-def create_user():
-    print(request.form, request.form.get('user_phone'))
-    group_id = GroupsDB().get(group_name=request.form.get('group_name')).id
-
-    UsersDB().set(group_id=group_id, user_email=request.form.get('user_email'),
-                  user_password='#123',
-                  user_first_name=request.form.get('user_first_name'),
-                  user_last_name=request.form.get('user_last_name'),
-                  user_phone=request.form.get('user_phone'))
-
-    return json.dumps({'response': 'success'})
-
-
-@app.route('/api/admin/create_track', methods=['POST'])
-def create_track():
-    form = request.form
-    # TracksDB().set(form.get('company'))
-    return json.dumps({'response': 'success'})
-
-
-@app.route('/api/admin/crate_group', methods=['POST'])
-def crate_group():
-    group_name = request.form.get('group_name')
-    print(group_name)
-    GroupsDB().set(group_name=group_name)
-    return json.dumps({'response': 'success'})
-
-
-@app.route('/api/admin/remove_sale', methods=['POST'])
-def remove_sale():
-    print(request.form)
-    return json.dumps({'response': 'success'})
-
-
-@app.route('/api/auth', methods=['POST'])
-def auth():
-    user_db = UsersDB()
-
-    email = request.form.get('email_user')
-    password = request.form.get('pw')
-
-    user = user_db.get(email)
-    if user:
-        if user.password == password:
-            data = base_to_dict(user)
-            data.update(admin_id=GroupsDB().get(user.group_id).name)
-            del data['user_password']
-            access_token = jwt.encode({'id': user.id, 'email_user': user.email}, SECRET)
-
-            return json.dumps({'auth': True,
-                               'data': data,
-                               'access_token': access_token.decode()},
-                              ensure_ascii=False).encode()
-    return json.dumps({'auth': False})
-
-
-@app.route('/api/my_sale')
-def my_sale():
-    _auth = request.headers.get('Authentication')
-    if _auth is not None:
-        try:
-            token = jwt.decode(_auth.encode(), SECRET)
-            email = token.get('email_user')
-            tdb = TransactionsDB()
-            return json.dumps({'data': base_to_dict(tdb.my_sale(email))}, ensure_ascii=False).encode()
-        except jwt.exceptions.DecodeError:
-            pass
-    return '', 403
+@app.route('/api/admins', methods=['GET', 'POST'])
+@app.route('/api/admins/<id_or_name>', methods=['GET', 'DELETE'])
+def groups(id_or_name=None):
+    db = GroupsDB()
+    if request.method == 'GET':
+        q = db.get(id_or_name) or []
+        return jsonify(base_to_dict(q))
+    if request.method == 'POST':
+        if verify_request(request, GROUPS_PARAMS):
+            params = request.json
+            status = db.set(params.get('group_name'))
+            if status:
+                return jsonify(status='success')
+    # if request.method == 'DELETE': TODO
+    #     status = db.delete(_id)
+    #     if status:
+    #         return jsonify(status='success')
+    return abort(400)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8080)

@@ -16,5 +16,12 @@ def datetime_handler(x):
     raise TypeError("Unknown type")
 
 
+def verify_request(request, params):
+    print(request.is_json)
+    if request.is_json:
+        return all(p in params for p in request.json)
+    return False
+
+
 if __name__ == '__main__':
     pass
