@@ -1,4 +1,3 @@
 PyJWT
 sqlalchemy
 flask
-flask-restful

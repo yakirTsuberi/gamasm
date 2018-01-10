@@ -17,7 +17,6 @@ def datetime_handler(x):
 
 
 def verify_request(request, params):
-    print(request.is_json)
     if request.is_json:
         return all(p in params for p in request.json)
     return False

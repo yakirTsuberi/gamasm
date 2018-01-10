@@ -6,7 +6,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 DB_PATH = 'sqlite:///' + str(Path(__file__).parent / 'data.db')
+engine = create_engine(DB_PATH, connect_args={'check_same_thread': False})
+Session = sessionmaker(bind=engine)
+session = Session()
+
 Base = declarative_base()
+
+
+def create_all_tables():
+    Base().metadata.create_all(engine, checkfirst=True)
 
 
 class Admins(Base):
@@ -101,13 +109,7 @@ class Transactions(Base):
 
 class DB:
     def __init__(self, __class):
-        self.engine = create_engine(DB_PATH, connect_args={'check_same_thread': False})
-        session = sessionmaker(bind=self.engine)
-        self.session = session()
         self._class = __class
-
-    def create_all_tables(self):
-        Base().metadata.create_all(self.engine, checkfirst=True)
 
 
 class AdminDB(DB):
@@ -116,41 +118,41 @@ class AdminDB(DB):
 
     def set(self, admin_email, admin_password, permissions):
         try:
-            self.session.add(self._class(admin_email=admin_email,
-                                         admin_password=admin_password,
-                                         permissions=permissions))
-            self.session.commit()
+            session.add(self._class(admin_email=admin_email,
+                                    admin_password=admin_password,
+                                    permissions=permissions))
+            session.commit()
             return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
             return False
 
     def update(self, _id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == _id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == _id).update(values)
+            session.commit()
             return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
             return False
 
     def delete(self, _id):
         try:
-            self.session.query(self._class).filter(self._class.id == _id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == _id).delete()
+            session.commit()
             return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
             return False
 
     def all(self):
-        return self.session.query(*self._class.__table__.columns).all()
+        return session.query(*self._class.__table__.columns).all()
 
     def get(self, _id=None):
-        q = self.session.query(*self._class.__table__.columns)
+        q = session.query(*self._class.__table__.columns)
         if _id is not None:
             q = q.filter(self._class.id == _id)
         if q.count() > 1 or _id is None:
@@ -164,35 +166,37 @@ class GroupsDB(DB):
 
     def set(self, group_name):
         try:
-            self.session.add(self._class(group_name=group_name))
-            self.session.commit()
+            session.add(self._class(group_name=group_name))
+            session.commit()
             return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
             return False
 
     def update(self, group_id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == group_id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == group_id).update(values)
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
-    def delete(self, group_id):
+    def delete(self, _id):
         try:
-            self.session.query(self._class).filter(self._class.id == group_id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == _id).delete()
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
     def all(self):
-        return self.session.query(*self._class.__table__.columns).all()
+        return session.query(*self._class.__table__.columns).all()
 
     def get(self, id_or_name=None):
-        q = self.session.query(*self._class.__table__.columns)
+        q = session.query(*self._class.__table__.columns)
         if id_or_name is not None:
             if id_or_name.isdigit():
                 q = q.filter(self._class.id == id_or_name)
@@ -209,41 +213,52 @@ class UsersDB(DB):
 
     def set(self, group_id, user_email, user_password, user_first_name, user_last_name, user_phone=None):
         try:
-            self.session.add(self._class(group_id=group_id,
-                                         user_email=str(user_email).lower(),
-                                         user_password=user_password,
-                                         user_first_name=str(user_first_name).lower(),
-                                         user_last_name=str(user_last_name).lower(),
-                                         user_phone=user_phone))
-            self.session.commit()
+            session.add(self._class(group_id=group_id,
+                                    user_email=str(user_email).lower(),
+                                    user_password=user_password,
+                                    user_first_name=str(user_first_name).lower(),
+                                    user_last_name=str(user_last_name).lower(),
+                                    user_phone=user_phone))
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
     def update(self, user_id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == user_id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == user_id).update(values)
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
-    def delete(self, user_id):
+    def delete(self, _id):
         try:
-            self.session.query(self._class).filter(self._class.id == user_id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == _id).delete()
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
     def all(self, group_id=None):
-        q = self.session.query(*self._class.__table__.columns)
+        q = session.query(*self._class.__table__.columns)
         if group_id is not None:
             q = q.filter(self._class.group_id == group_id)
         return q.all()
 
-    def get(self, email):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.email == email.lower()).first()
+    def get(self, _id=None):
+        q = session.query(*self._class.__table__.columns)
+        if _id is not None:
+            q = q.filter(self._class.id == _id)
+        if q.count() > 1 or _id is None:
+            return q.all()
+        return q.first()
 
 
 class TmpDB(DB):
@@ -252,22 +267,22 @@ class TmpDB(DB):
 
     def set(self, unique_id, email_user):
         try:
-            self.session.add(self._class(unique_id=unique_id, email_user=email_user))
-            self.session.commit()
+            session.add(self._class(unique_id=unique_id, email_user=email_user))
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def delete(self, email_user):
         try:
-            self.session.query(self._class).filter(self._class.email_user == email_user).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.email_user == email_user).delete()
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def get(self, email_user):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.email_user == email_user).first()
+        return session.query(*self._class.__table__.columns).filter(self._class.email_user == email_user).first()
 
 
 class TracksDB(DB):
@@ -276,42 +291,53 @@ class TracksDB(DB):
 
     def set(self, company, price, track_name, description, kosher):
         try:
-            self.session.add(self._class(company=company,
-                                         price=price,
-                                         track_name=track_name,
-                                         description=description,
-                                         kosher=kosher))
-            self.session.commit()
+            session.add(self._class(company=company,
+                                    price=price,
+                                    track_name=track_name,
+                                    description=description,
+                                    kosher=kosher))
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
     def update(self, track_id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == track_id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == track_id).update(values)
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
     def delete(self, track_id):
         try:
-            self.session.query(self._class).filter(self._class.id == track_id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == track_id).delete()
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
     def all(self, company=None, kosher=None):
-        q = self.session.query(*self._class.__table__.columns)
+        q = session.query(*self._class.__table__.columns)
         if company is not None:
             q = q.filter(self._class.company == company)
         if kosher is not None:
             q = q.filter(self._class.kosher == kosher)
         return q.all()
 
-    def get(self, track_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.id == track_id).first()
+    def get(self, _id):
+        q = session.query(*self._class.__table__.columns)
+        if _id is not None:
+            q = q.filter(self._class.id == _id)
+        if q.count() > 1 or _id is None:
+            return q.all()
+        return q.first()
 
 
 class ClientsDB(DB):
@@ -321,39 +347,50 @@ class ClientsDB(DB):
     def set(self, client_id, client_first_name, client_last_name, client_address, city, client_phone,
             client_email=None):
         try:
-            self.session.add(self._class(client_id=client_id,
-                                         client_first_name=client_first_name,
-                                         client_last_name=client_last_name,
-                                         client_address=client_address,
-                                         city=city,
-                                         client_phone=client_phone,
-                                         client_email=client_email))
-            self.session.commit()
+            session.add(self._class(client_id=client_id,
+                                    client_first_name=client_first_name,
+                                    client_last_name=client_last_name,
+                                    client_address=client_address,
+                                    city=city,
+                                    client_phone=client_phone,
+                                    client_email=client_email))
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
-    def update(self, client_id, values):
+    def update(self, _id, values):
         try:
-            self.session.query(self._class).filter(self._class.client_id == client_id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == _id).update(values)
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
-    def delete(self, client_id):
+    def delete(self, _id):
         try:
-            self.session.query(self._class).filter(self._class.client_id == client_id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == _id).delete()
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
+            return False
 
     def all(self):
-        return self.session.query(*self._class.__table__.columns).all()
+        return session.query(*self._class.__table__.columns).all()
 
-    def get(self, client_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.client_id == client_id).first()
+    def get(self, _id):
+        q = session.query(*self._class.__table__.columns)
+        if _id is not None:
+            q = q.filter(self._class.id == _id)
+        if q.count() > 1 or _id is None:
+            return q.all()
+        return q.first()
 
 
 class CreditCardDB(DB):
@@ -362,40 +399,40 @@ class CreditCardDB(DB):
 
     def set(self, client_id, card_number, month, year, cvv):
         try:
-            self.session.add(self._class(client_id=client_id,
-                                         card_number=card_number,
-                                         month=month,
-                                         year=year,
-                                         cvv=cvv))
-            self.session.commit()
+            session.add(self._class(client_id=client_id,
+                                    card_number=card_number,
+                                    month=month,
+                                    year=year,
+                                    cvv=cvv))
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def update(self, credit_card_id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == credit_card_id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == credit_card_id).update(values)
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def delete(self, credit_card_id):
         try:
-            self.session.query(self._class).filter(self._class.id == credit_card_id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == credit_card_id).delete()
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def all(self, client_id=None):
-        q = self.session.query(*self._class.__table__.columns)
+        q = session.query(*self._class.__table__.columns)
         if client_id is not None:
             q = q.filter(self._class.client_id == client_id)
         return q.all()
 
     def get(self, credit_card_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.id == credit_card_id).first()
+        return session.query(*self._class.__table__.columns).filter(self._class.id == credit_card_id).first()
 
 
 class BankAccountDB(DB):
@@ -404,39 +441,39 @@ class BankAccountDB(DB):
 
     def set(self, client_id, account_num, brunch, bank_num):
         try:
-            self.session.add(self._class(client_id=client_id,
-                                         account_num=account_num,
-                                         brunch=brunch,
-                                         bank_num=bank_num))
-            self.session.commit()
+            session.add(self._class(client_id=client_id,
+                                    account_num=account_num,
+                                    brunch=brunch,
+                                    bank_num=bank_num))
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def update(self, bank_account_id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == bank_account_id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == bank_account_id).update(values)
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def delete(self, bank_account_id):
         try:
-            self.session.query(self._class).filter(self._class.id == bank_account_id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == bank_account_id).delete()
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def all(self, client_id=None):
-        q = self.session.query(*self._class.__table__.columns)
+        q = session.query(*self._class.__table__.columns)
         if client_id is not None:
             q = q.filter(self._class.client_id == client_id)
         return q.all()
 
     def get(self, bank_account_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.id == bank_account_id).first()
+        return session.query(*self._class.__table__.columns).filter(self._class.id == bank_account_id).first()
 
 
 class TransactionsDB(DB):
@@ -446,52 +483,52 @@ class TransactionsDB(DB):
     def set(self, user_email, track_id, client_id, date_time, sim_num, phone_num,
             status=0, transaction_client=None, comment=None, reminds=None, credit_card_id=None, bank_account_id=None):
         try:
-            self.session.add(self._class(email_user=user_email,
-                                         track_id=track_id,
-                                         client_id=client_id,
-                                         credit_card_id=credit_card_id,
-                                         bank_account_id=bank_account_id,
-                                         date_time=date_time,
-                                         sim_num=sim_num,
-                                         phone_num=phone_num,
-                                         status=status,
-                                         transaction_client=transaction_client,
-                                         comment=comment,
-                                         reminds=reminds,
-                                         ))
-            self.session.commit()
+            session.add(self._class(email_user=user_email,
+                                    track_id=track_id,
+                                    client_id=client_id,
+                                    credit_card_id=credit_card_id,
+                                    bank_account_id=bank_account_id,
+                                    date_time=date_time,
+                                    sim_num=sim_num,
+                                    phone_num=phone_num,
+                                    status=status,
+                                    transaction_client=transaction_client,
+                                    comment=comment,
+                                    reminds=reminds,
+                                    ))
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
             raise e
 
     def update(self, transactions_id, values):
         try:
-            self.session.query(self._class).filter(self._class.id == transactions_id).update(values)
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == transactions_id).update(values)
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def delete(self, transactions_id):
         try:
-            self.session.query(self._class).filter(self._class.id == transactions_id).delete()
-            self.session.commit()
+            session.query(self._class).filter(self._class.id == transactions_id).delete()
+            session.commit()
         except Exception as e:
             logging.error(e)
-            self.session.rollback()
+            session.rollback()
 
     def all(self, client_id=None):
-        q = self.session.query(*self._class.__table__.columns)
+        q = session.query(*self._class.__table__.columns)
         if client_id is not None:
             q = q.filter(self._class.client_id == client_id)
         return q.all()
 
     def get(self, transactions_id):
-        return self.session.query(*self._class.__table__.columns).filter(self._class.id == transactions_id).first()
+        return session.query(*self._class.__table__.columns).filter(self._class.id == transactions_id).first()
 
     def my_sale(self, email):
-        q = self.session.query(
+        q = session.query(
             Transactions.id,
             Clients.client_first_name,
             Clients.client_last_name,
@@ -507,42 +544,28 @@ class TransactionsDB(DB):
         return q.all()
 
     def status_sale(self):
-        q = self.session.query(Transactions.id,
-                               Transactions.date_time,
-                               Transactions.sim_num,
-                               Transactions.phone_num,
-                               Transactions.comment,
-                               Transactions.status,
-                               Transactions.credit_card_id,
-                               Transactions.bank_account_id,
-                               Users.user_first_name,
-                               Users.user_last_name,
-                               Clients.client_first_name,
-                               Clients.client_last_name,
-                               Clients.client_address,
-                               Clients.city,
-                               Clients.client_id,
-                               Tracks.company,
-                               Tracks.track_name)
+        q = session.query(Transactions.id,
+                          Transactions.date_time,
+                          Transactions.sim_num,
+                          Transactions.phone_num,
+                          Transactions.comment,
+                          Transactions.status,
+                          Transactions.credit_card_id,
+                          Transactions.bank_account_id,
+                          Users.user_first_name,
+                          Users.user_last_name,
+                          Clients.client_first_name,
+                          Clients.client_last_name,
+                          Clients.client_address,
+                          Clients.city,
+                          Clients.client_id,
+                          Tracks.company,
+                          Tracks.track_name)
         q = q.join((Users, Users.user_email == Transactions.email_user),
                    (Clients, Clients.client_id == Transactions.client_id),
                    (Tracks, Tracks.id == Transactions.track_id))
-        print(q)
         q = q.filter(Transactions.status == 0)
         return q.all()
-
-
-def _create_db():
-    groups = GroupsDB()
-    groups.create_all_tables()
-    groups.set('ישיפון')
-    groups.set('טסט')
-    group_a = groups.get(group_name='ישיפון')
-    group_b = groups.get(group_name='טסט')
-
-    users = UsersDB()
-    users.set(group_a.id, 'yakir@ravtech.co.il', '1q2w3e4r', 'יקיר', 'צוברי', '0527168254')
-    users.set(group_b.id, 'moshe@ravtech.co.il', '1q2w3e4r', 'משה', 'דחבש', '0527174851')
 
 
 if __name__ == '__main__':
@@ -559,4 +582,4 @@ if __name__ == '__main__':
     # CreditCardDB().set('223366683', '741258963', '03', '21', '123')
     # TransactionsDB().update(1, dict(credit_card_id=1))
     # TransactionsDB().update(1, dict(status=0))
-    print(AdminDB().all())
+    # print(AdminDB().all())
