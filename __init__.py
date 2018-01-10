@@ -18,6 +18,8 @@ USERS_PARAMS = ['group_id', 'user_email', 'user_password', 'user_first_name', 'u
 CLIENTS_PARAMS = ['client_id', 'client_first_name', 'client_last_name', 'client_address', 'city', 'client_phone',
                   'client_email']
 TRACKS_PARAMS = ['company', 'price', 'track_name', 'description', 'kosher']
+TRANSACTIONS_PARAMS = ['email_user', 'track_id', 'client_id', 'credit_card_id', 'bank_account_id',
+                       'date_time', 'sim_num', 'phone_num', 'status', 'transaction_client', 'comment', 'reminds']
 
 
 def get(db, _id=None):
@@ -28,11 +30,13 @@ def get(db, _id=None):
 def post(db, data_params, _id):
     if verify_request(request, data_params):
         return _response(db.set(**request.json))
+    abort(400)
 
 
 def put(db, data_params, _id):
     if verify_request(request, data_params):
         return _response(db.update(_id, request.json))
+    abort(400)
 
 
 def delete(db, _id):
@@ -90,6 +94,14 @@ def clients(_id=None):
 def tracks(_id=None):
     db = TracksDB()
     return simple_api(db, TRACKS_PARAMS, _id)
+
+
+@app.route('/api/transactions', methods=['GET', 'POST'])
+@app.route('/api/transactions/<_id>', methods=['GET', 'PUT', 'DELETE'])
+def transactions(_id=None):
+    db = TransactionsDB()
+    # TODO
+    return simple_api(db, TRANSACTIONS_PARAMS, _id)
 
 
 @app.teardown_appcontext

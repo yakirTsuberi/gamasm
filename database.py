@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Dict, List
 
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, ForeignKey, DateTime, Date
 from sqlalchemy.ext.declarative import declarative_base
@@ -480,27 +481,30 @@ class TransactionsDB(DB):
     def __init__(self):
         super().__init__(Transactions)
 
-    def set(self, user_email, track_id, client_id, date_time, sim_num, phone_num,
+    def set(self, user_email, tracks: Dict[str, List[dict]], client_id, date_time,
             status=0, transaction_client=None, comment=None, reminds=None, credit_card_id=None, bank_account_id=None):
         try:
-            session.add(self._class(email_user=user_email,
-                                    track_id=track_id,
-                                    client_id=client_id,
-                                    credit_card_id=credit_card_id,
-                                    bank_account_id=bank_account_id,
-                                    date_time=date_time,
-                                    sim_num=sim_num,
-                                    phone_num=phone_num,
-                                    status=status,
-                                    transaction_client=transaction_client,
-                                    comment=comment,
-                                    reminds=reminds,
-                                    ))
+            for k, v in tracks:
+                for t in v:
+                    session.add(self._class(email_user=user_email,
+                                            track_id=k,
+                                            client_id=client_id,
+                                            credit_card_id=credit_card_id,
+                                            bank_account_id=bank_account_id,
+                                            date_time=date_time,
+                                            sim_num=t.get('sim_num'),
+                                            phone_num=t.get('phone_num'),
+                                            status=status,
+                                            transaction_client=transaction_client,
+                                            comment=comment,
+                                            reminds=reminds,
+                                            ))
             session.commit()
+            return True
         except Exception as e:
             logging.error(e)
             session.rollback()
-            raise e
+            return False
 
     def update(self, transactions_id, values):
         try:
