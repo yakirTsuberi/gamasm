@@ -25,8 +25,8 @@ TRANSACTIONS_PARAMS = ['user_email', 'tracks', 'payment', 'client_id', 'client_f
 
 
 def get(db, _id=None):
-    q = db.get(_id) or []
-    return Response(json.dumps(base_to_dict(q)), mimetype='application/json')
+    q = base_to_dict(db.get(_id) or [])
+    return Response(json.dumps(q, default=datetime_handler), mimetype='application/json')
 
 
 def post(db, data_params):
@@ -102,7 +102,6 @@ def tracks(_id=None):
 @app.route('/api/transactions/<_id>', methods=['GET', 'PUT', 'DELETE'])
 def transactions(_id=None):
     db = TransactionsDB()
-    print(request.json)
     return simple_api(db, TRANSACTIONS_PARAMS, _id)
 
 

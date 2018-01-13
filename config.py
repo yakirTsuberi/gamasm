@@ -11,14 +11,14 @@ def base_to_dict(query):
 
 
 def datetime_handler(x):
-    if isinstance(x, datetime.datetime):
-        return str(x.replace(microsecond=0))
-    raise TypeError("Unknown type")
+    if isinstance(x, datetime.datetime) or isinstance(x, datetime.date):
+        if isinstance(x, datetime.datetime):
+            x = x.replace(microsecond=0)
+        return str(x)
 
 
 def verify_request(request, params):
     if params is not None:
-        print(all(p in params for p in request.json))
         return all(p in params for p in request.json)
 
 

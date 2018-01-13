@@ -369,6 +369,7 @@ class ClientsDB(DB):
 
     def get(self, _id):
         q = session.query(*self._class.__table__.columns)
+        print(q.all())
         if _id is not None:
             q = q.filter(self._class.id == _id)
         if q.count() > 1 or _id is None:
@@ -383,14 +384,14 @@ class TransactionsDB(DB):
     @staticmethod
     def _add_client(client_id, client_first_name, client_last_name, client_address, city, client_phone,
                     client_email):
-        client = session.query(Clients.id).filter(Clients.client_id == client_id).first()
+        client = session.query(Clients.client_id).filter(Clients.client_id == client_id).first()
         if client is None:
             if ClientsDB().set(client_id, client_first_name, client_last_name, client_address, city, client_phone,
                                client_email):
-                client = session.query(Clients.id).filter(Clients.client_id == client_id).first()
+                client = session.query(Clients.client_id).filter(Clients.client_id == client_id).first()
             else:
                 return False
-        print(client)
+        print(client.keys())
         return client.client_id
 
     @staticmethod
@@ -404,6 +405,8 @@ class TransactionsDB(DB):
             client = self._add_client(client_id, client_first_name, client_last_name, client_address, city,
                                       client_phone, client_email)
             payment = self._add_payment(payment)  # TODO
+            if reminds is not None:
+                reminds = datetime.strptime(reminds, '%Y-%m-%d').date()
             if not any([client, payment]):
                 return False
             print(client)
@@ -452,8 +455,11 @@ class TransactionsDB(DB):
             q = q.filter(self._class.client_id == client_id)
         return q.all()
 
-    def get(self, transactions_id):
-        return session.query(*self._class.__table__.columns).filter(self._class.id == transactions_id).first()
+    def get(self, _id=None):
+        q = session.query(*self._class.__table__.columns)
+        if _id is not None:
+            q = q.filter(self._class.id == _id)
+        return q.all()
 
     @staticmethod
     def my_sale(email):
