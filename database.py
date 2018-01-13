@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
@@ -72,33 +73,13 @@ class Clients(Base):
     client_email = Column(String, nullable=True)
 
 
-class CreditCard(Base):
-    __tablename__ = 'CreditCard'
-    id = Column(Integer, primary_key=True)
-    client_id = Column(String, ForeignKey(Clients.client_id))
-    card_number = Column(String)
-    month = Column(String)
-    year = Column(String)
-    cvv = Column(String)
-
-
-class BankAccount(Base):
-    __tablename__ = 'BankAccount'
-    id = Column(Integer, primary_key=True)
-    client_id = Column(String, ForeignKey(Clients.client_id))
-    account_num = Column(String)
-    brunch = Column(String)
-    bank_num = Column(String)
-
-
 class Transactions(Base):
     __tablename__ = 'Transactions'
     id = Column(Integer, primary_key=True)
     email_user = Column(String, ForeignKey(Users.user_email))
     track_id = Column(Integer, ForeignKey(Tracks.id))
     client_id = Column(String, ForeignKey(Clients.client_id))
-    credit_card_id = Column(Integer, ForeignKey(CreditCard.id), nullable=True)
-    bank_account_id = Column(Integer, ForeignKey(BankAccount.id), nullable=True)
+    payment = Column(String)  # TODO check is json
     date_time = Column(DateTime)
     sim_num = Column(String)
     phone_num = Column(String)
@@ -198,6 +179,7 @@ class GroupsDB(DB):
 
     def get(self, id_or_name=None):
         q = session.query(*self._class.__table__.columns)
+        print(id_or_name)
         if id_or_name is not None:
             if id_or_name.isdigit():
                 q = q.filter(self._class.id == id_or_name)
@@ -394,108 +376,49 @@ class ClientsDB(DB):
         return q.first()
 
 
-class CreditCardDB(DB):
-    def __init__(self):
-        super().__init__(CreditCard)
-
-    def set(self, client_id, card_number, month, year, cvv):
-        try:
-            session.add(self._class(client_id=client_id,
-                                    card_number=card_number,
-                                    month=month,
-                                    year=year,
-                                    cvv=cvv))
-            session.commit()
-        except Exception as e:
-            logging.error(e)
-            session.rollback()
-
-    def update(self, credit_card_id, values):
-        try:
-            session.query(self._class).filter(self._class.id == credit_card_id).update(values)
-            session.commit()
-        except Exception as e:
-            logging.error(e)
-            session.rollback()
-
-    def delete(self, credit_card_id):
-        try:
-            session.query(self._class).filter(self._class.id == credit_card_id).delete()
-            session.commit()
-        except Exception as e:
-            logging.error(e)
-            session.rollback()
-
-    def all(self, client_id=None):
-        q = session.query(*self._class.__table__.columns)
-        if client_id is not None:
-            q = q.filter(self._class.client_id == client_id)
-        return q.all()
-
-    def get(self, credit_card_id):
-        return session.query(*self._class.__table__.columns).filter(self._class.id == credit_card_id).first()
-
-
-class BankAccountDB(DB):
-    def __init__(self):
-        super().__init__(BankAccount)
-
-    def set(self, client_id, account_num, brunch, bank_num):
-        try:
-            session.add(self._class(client_id=client_id,
-                                    account_num=account_num,
-                                    brunch=brunch,
-                                    bank_num=bank_num))
-            session.commit()
-        except Exception as e:
-            logging.error(e)
-            session.rollback()
-
-    def update(self, bank_account_id, values):
-        try:
-            session.query(self._class).filter(self._class.id == bank_account_id).update(values)
-            session.commit()
-        except Exception as e:
-            logging.error(e)
-            session.rollback()
-
-    def delete(self, bank_account_id):
-        try:
-            session.query(self._class).filter(self._class.id == bank_account_id).delete()
-            session.commit()
-        except Exception as e:
-            logging.error(e)
-            session.rollback()
-
-    def all(self, client_id=None):
-        q = session.query(*self._class.__table__.columns)
-        if client_id is not None:
-            q = q.filter(self._class.client_id == client_id)
-        return q.all()
-
-    def get(self, bank_account_id):
-        return session.query(*self._class.__table__.columns).filter(self._class.id == bank_account_id).first()
-
-
 class TransactionsDB(DB):
     def __init__(self):
         super().__init__(Transactions)
 
-    def set(self, user_email, tracks: Dict[str, List[dict]], client_id, date_time,
-            status=0, transaction_client=None, comment=None, reminds=None, credit_card_id=None, bank_account_id=None):
+    @staticmethod
+    def _add_client(client_id, client_first_name, client_last_name, client_address, city, client_phone,
+                    client_email):
+        client = session.query(Clients.id).filter(Clients.client_id == client_id).first()
+        if client is None:
+            if ClientsDB().set(client_id, client_first_name, client_last_name, client_address, city, client_phone,
+                               client_email):
+                client = session.query(Clients.id).filter(Clients.client_id == client_id).first()
+            else:
+                return False
+        print(client)
+        return client.client_id
+
+    @staticmethod
+    def _add_payment(payment):
+        return payment
+
+    def set(self, user_email, tracks: Dict[str, List[dict]], payment,
+            client_id, client_first_name, client_last_name, client_address, city, client_phone, client_email,
+            comment, reminds):
         try:
-            for k, v in tracks:
+            client = self._add_client(client_id, client_first_name, client_last_name, client_address, city,
+                                      client_phone, client_email)
+            payment = self._add_payment(payment)  # TODO
+            if not any([client, payment]):
+                return False
+            print(client)
+            for k, v in tracks.items():
                 for t in v:
+                    print(k, t)
                     session.add(self._class(email_user=user_email,
                                             track_id=k,
-                                            client_id=client_id,
-                                            credit_card_id=credit_card_id,
-                                            bank_account_id=bank_account_id,
-                                            date_time=date_time,
+                                            client_id=client,
+                                            payment=payment,
+                                            date_time=datetime.utcnow(),
                                             sim_num=t.get('sim_num'),
                                             phone_num=t.get('phone_num'),
-                                            status=status,
-                                            transaction_client=transaction_client,
+                                            status=0,
+                                            transaction_client=None,
                                             comment=comment,
                                             reminds=reminds,
                                             ))
@@ -503,6 +426,7 @@ class TransactionsDB(DB):
             return True
         except Exception as e:
             logging.error(e)
+            print(e)
             session.rollback()
             return False
 
@@ -531,7 +455,8 @@ class TransactionsDB(DB):
     def get(self, transactions_id):
         return session.query(*self._class.__table__.columns).filter(self._class.id == transactions_id).first()
 
-    def my_sale(self, email):
+    @staticmethod
+    def my_sale(email):
         q = session.query(
             Transactions.id,
             Clients.client_first_name,
@@ -547,15 +472,15 @@ class TransactionsDB(DB):
         q = q.filter(Transactions.email_user == email)
         return q.all()
 
-    def status_sale(self):
+    @staticmethod
+    def status_sale():
         q = session.query(Transactions.id,
                           Transactions.date_time,
                           Transactions.sim_num,
                           Transactions.phone_num,
                           Transactions.comment,
                           Transactions.status,
-                          Transactions.credit_card_id,
-                          Transactions.bank_account_id,
+                          Transactions.payment,
                           Users.user_first_name,
                           Users.user_last_name,
                           Clients.client_first_name,
@@ -574,16 +499,3 @@ class TransactionsDB(DB):
 
 if __name__ == '__main__':
     pass
-    # _create_db()
-    # DB(Clients).create_all_tables()
-    # print(GroupsDB().all())
-    # GroupsDB().set('ישיפון')
-    # UsersDB().set(1, 'yakir@ravtech.co.il', '1q2w3e4r', 'יקיר', 'צוברי', '0527168254')
-    # TracksDB().set('cellcom', 29, 'ללא הגבלה', 'כשר ללא הגבלה', True)
-    # ClientsDB().set('302637350', 'שלום', 'חלפון', 'הנורית 5', 'השרון', '0506615048')
-    # t = TransactionsDB().set('yakir@ravtech.co.il', 1, '302637350', datetime.now(), '987654321', '0502222222')
-    # print(base_to_dict(TransactionsDB().status_sale()))
-    # CreditCardDB().set('223366683', '741258963', '03', '21', '123')
-    # TransactionsDB().update(1, dict(credit_card_id=1))
-    # TransactionsDB().update(1, dict(status=0))
-    # print(AdminDB().all())

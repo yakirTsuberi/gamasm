@@ -1,13 +1,15 @@
 import json
 
 import jwt
-from flask import Flask, request, render_template, jsonify, abort
+from flask import Flask, request, render_template, jsonify, abort, Response
 
-from database import session, UsersDB, GroupsDB, TransactionsDB, CreditCardDB, BankAccountDB, AdminDB, ClientsDB, \
+from database import session, create_all_tables, UsersDB, GroupsDB, TransactionsDB, AdminDB, ClientsDB, \
     TracksDB
 from config import base_to_dict, datetime_handler, verify_request
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
+
+create_all_tables()
 
 app = Flask(__name__)
 app.secret_key = SECRET
@@ -18,16 +20,16 @@ USERS_PARAMS = ['group_id', 'user_email', 'user_password', 'user_first_name', 'u
 CLIENTS_PARAMS = ['client_id', 'client_first_name', 'client_last_name', 'client_address', 'city', 'client_phone',
                   'client_email']
 TRACKS_PARAMS = ['company', 'price', 'track_name', 'description', 'kosher']
-TRANSACTIONS_PARAMS = ['email_user', 'track_id', 'client_id', 'credit_card_id', 'bank_account_id',
-                       'date_time', 'sim_num', 'phone_num', 'status', 'transaction_client', 'comment', 'reminds']
+TRANSACTIONS_PARAMS = ['user_email', 'tracks', 'payment', 'client_id', 'client_first_name', 'client_last_name',
+                       'client_address', 'city', 'client_phone', 'client_email', 'comment', 'reminds']
 
 
 def get(db, _id=None):
     q = db.get(_id) or []
-    return jsonify(base_to_dict(q))
+    return Response(json.dumps(base_to_dict(q)), mimetype='application/json')
 
 
-def post(db, data_params, _id):
+def post(db, data_params):
     if verify_request(request, data_params):
         return _response(db.set(**request.json))
     abort(400)
@@ -53,7 +55,7 @@ def simple_api(db, data_params, _id=None):
     if request.method == 'GET':
         return get(db, _id)
     if request.method == 'POST':
-        return post(db, data_params, _id)
+        return post(db, data_params)
     if request.method == 'PUT':
         return put(db, data_params, _id)
     if request.method == 'DELETE':
@@ -100,7 +102,7 @@ def tracks(_id=None):
 @app.route('/api/transactions/<_id>', methods=['GET', 'PUT', 'DELETE'])
 def transactions(_id=None):
     db = TransactionsDB()
-    # TODO
+    print(request.json)
     return simple_api(db, TRANSACTIONS_PARAMS, _id)
 
 
