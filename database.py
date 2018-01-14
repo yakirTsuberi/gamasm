@@ -6,6 +6,7 @@ from typing import Dict, List
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, ForeignKey, DateTime, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from werkzeug.security import generate_password_hash
 
 DB_PATH = 'sqlite:///' + str(Path(__file__).parent / 'data.db')
 engine = create_engine(DB_PATH, connect_args={'check_same_thread': False})
@@ -84,7 +85,7 @@ class Transactions(Base):
     sim_num = Column(String)
     phone_num = Column(String)
     status = Column(Integer)  # 0=new, 1=success, 2=fail
-    transaction_client = Column(String, nullable=True)
+    transaction_client = Column(String, nullable=True)  # TODO ?
     comment = Column(String, nullable=True)
     reminds = Column(Date, nullable=True)
 
@@ -198,7 +199,7 @@ class UsersDB(DB):
         try:
             session.add(self._class(group_id=group_id,
                                     user_email=str(user_email).lower(),
-                                    user_password=user_password,
+                                    user_password=self.set_password(user_password),
                                     user_first_name=str(user_first_name).lower(),
                                     user_last_name=str(user_last_name).lower(),
                                     user_phone=user_phone))
@@ -235,13 +236,19 @@ class UsersDB(DB):
             q = q.filter(self._class.group_id == group_id)
         return q.all()
 
-    def get(self, _id=None):
+    def get(self, user_email=None, _id=None):
         q = session.query(*self._class.__table__.columns)
+        if user_email is not None:
+            q = q.filter(self._class.user_email == user_email)
         if _id is not None:
             q = q.filter(self._class.id == _id)
-        if q.count() > 1 or _id is None:
+        if q.count() > 1 or user_email is None:
             return q.all()
         return q.first()
+
+    @staticmethod
+    def set_password(password):
+        return generate_password_hash(password)
 
 
 class TmpDB(DB):
@@ -399,14 +406,15 @@ class TransactionsDB(DB):
         return payment
 
     def set(self, user_email, tracks: Dict[str, List[dict]], payment,
-            client_id, client_first_name, client_last_name, client_address, city, client_phone, client_email,
-            comment, reminds):
+            client_id, client_first_name=None, client_last_name=None, client_address=None, city=None, client_phone=None,
+            client_email=None, comment=None, reminds=None):
         try:
             client = self._add_client(client_id, client_first_name, client_last_name, client_address, city,
                                       client_phone, client_email)
             payment = self._add_payment(payment)  # TODO
             if reminds is not None:
                 reminds = datetime.strptime(reminds, '%Y-%m-%d').date()
+
             if not any([client, payment]):
                 return False
             print(client)
@@ -433,74 +441,42 @@ class TransactionsDB(DB):
             session.rollback()
             return False
 
-    def update(self, transactions_id, values):
+    def update(self, _id, values):
         try:
-            session.query(self._class).filter(self._class.id == transactions_id).update(values)
+            print(values)
+            session.query(self._class).filter(self._class.id == _id).update(values)
             session.commit()
+            return True
         except Exception as e:
             logging.error(e)
+            print(e)
             session.rollback()
+            return False
 
     def delete(self, transactions_id):
         try:
             session.query(self._class).filter(self._class.id == transactions_id).delete()
             session.commit()
+            return True
         except Exception as e:
             logging.error(e)
             session.rollback()
-
-    def all(self, client_id=None):
-        q = session.query(*self._class.__table__.columns)
-        if client_id is not None:
-            q = q.filter(self._class.client_id == client_id)
-        return q.all()
+            return False
 
     def get(self, _id=None):
+        result = dict()
         q = session.query(*self._class.__table__.columns)
         if _id is not None:
-            q = q.filter(self._class.id == _id)
-        return q.all()
-
-    @staticmethod
-    def my_sale(email):
-        q = session.query(
-            Transactions.id,
-            Clients.client_first_name,
-            Clients.client_last_name,
-            Clients.client_phone,
-            Tracks.track_name,
-            Transactions.status,
-            Transactions.date_time,
-            Transactions.phone_num,
-            Transactions.sim_num,
-            Transactions.comment)
-        q = q.join(Tracks, (Clients, Clients.client_id == Transactions.client_id))
-        q = q.filter(Transactions.email_user == email)
-        return q.all()
-
-    @staticmethod
-    def status_sale():
-        q = session.query(Transactions.id,
-                          Transactions.date_time,
-                          Transactions.sim_num,
-                          Transactions.phone_num,
-                          Transactions.comment,
-                          Transactions.status,
-                          Transactions.payment,
-                          Users.user_first_name,
-                          Users.user_last_name,
-                          Clients.client_first_name,
-                          Clients.client_last_name,
-                          Clients.client_address,
-                          Clients.city,
-                          Clients.client_id,
-                          Tracks.company,
-                          Tracks.track_name)
-        q = q.join((Users, Users.user_email == Transactions.email_user),
-                   (Clients, Clients.client_id == Transactions.client_id),
-                   (Tracks, Tracks.id == Transactions.track_id))
-        q = q.filter(Transactions.status == 0)
-        return q.all()
+            q = q.filter(Transactions.id == _id)
+        for t in q.all():
+            if result.get(t.client_id) is None:
+                result[t.client_id] = {t.track_id: []}
+            tmp = dict(id=t.id, date_time=str(t.date_time),
+                       sim_num=t.sim_num, phone_num=t.phone_num,
+                       comment=t.comment, status=t.status,
+                       payment=t.payment, email_user=t.email_user)
+            result[t.client_id][t.track_id].append(tmp)
+        return result
 
 
 if __name__ == '__main__':
