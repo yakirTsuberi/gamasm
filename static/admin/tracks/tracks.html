@@ -11,8 +11,167 @@
         <div ng-repeat="(k, v) in tc.companies" ng-class="$index == 0 ? 'tab-pane active': 'tab-pane'" id="{a k a}">
             <h4>
                 {a v a}
-                <button class="btn btn-primary pull-left"><span class="glyphicon glyphicon-plus"></span></button>
+                <button class="login-form-btn pull-left" data-toggle="modal" data-target="#trackPostModal"
+                        ng-click="tc.params.company=k">
+                    <span>מסלול חדש</span>
+                </button>
             </h4>
+            <!--['company', 'price', 'track_name', 'description', 'kosher']-->
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>שם</th>
+                    <th>מחיר</th>
+                    <th>תיאור</th>
+                    <th>כשר?</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="t in tc.tracks" ng-if="t.company == k">
+                    <td>{a t.track_name a}</td>
+                    <td>{a t.price a}</td>
+                    <td>{a t.description a}</td>
+                    <td><span class="glyphicon" ng-class="t.kosher ? 'glyphicon-thumbs-up text-success':'glyphicon-thumbs-down text-danger'"></span></td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link" type="button" data-toggle="dropdown"
+                                    ng-click="tc.select_track=t">
+                                <span class="glyphicon glyphicon glyphicon-chevron-down"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a data-toggle="modal" data-target="#trackPutModal">
+                                        <span class="text-info glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a data-toggle="modal" data-target="#trackDeletetModal">
+                                        <span class="text-danger glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="trackPostModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">מסלול חדש - <span>{a tc.companies[tc.params.company] a}</span></h3>
+                </div>
+                <div class="modal-body">
+
+                    <form class="login-form validate-form flex-sb flex-w">
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="number" ng-model="tc.params.price" placeholder="מחיר">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="tc.params.track_name"
+                                   placeholder="שם מסלול">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <textarea class="input classic" ng-model="tc.params.description"
+                                      placeholder="תיאור"></textarea>
+                            <span class="focus-input"></span>
+                        </div>
+
+                        <div class="flex-sb-m w-full p-t-3 p-b-24">
+                            <div class="contact-form-checkbox">
+                                <input class="input-checkbox" id="kosher" type="checkbox" ng-model="tc.params.kosher">
+                                <label class="label-checkbox" for="kosher">
+                                    כשר?
+                                </label>
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">סגור</button>
+                    <button type="submit" class="btn btn-primary" ng-click="tc.post()">הוסף</button>
+                    <!--<button type="button" class="login-form-btn" data-dismiss="modal">שמור</button>-->
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="trackDeletetModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">האם בטוח שברצונך למחוק?</h3>
+                </div>
+                <div class="modal-body">
+                    <p>מסלול: {a tc.select_track.track_name a}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">לא, אל תמחוק.</button>
+                    <button type="submit" class="btn btn-danger" ng-click="tc.delete()">כן, תמחוק</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="trackPutModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">עריכת מסלול</h3>
+                </div>
+                <div class="modal-body">
+
+                    <form class="login-form validate-form flex-sb flex-w">
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="number" ng-model="tc.select_track.price" placeholder="מחיר">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="tc.select_track.track_name"
+                                   placeholder="שם מסלול">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <textarea class="input classic" ng-model="tc.select_track.description"
+                                      placeholder="תיאור"></textarea>
+                            <span class="focus-input"></span>
+                        </div>
+
+                        <div class="flex-sb-m w-full p-t-3 p-b-24">
+                            <div class="contact-form-checkbox">
+                                <input class="input-checkbox" id="kosher2" type="checkbox" ng-model="tc.select_track.kosher">
+                                <label class="label-checkbox" for="kosher2">
+                                    כשר?
+                                </label>
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">סגור</button>
+                    <button type="submit" class="btn btn-primary" ng-click="tc.put()">שמור</button>
+                    <!--<button type="button" class="login-form-btn" data-dismiss="modal">שמור</button>-->
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

@@ -479,6 +479,7 @@ class TransactionsDB(DB):
 
 if __name__ == '__main__':
     pass
+    print(TracksDB().get())
     # create_all_tables()
     # AdminDB().set('yakir@ravtech.co.il', '123', 3)
 

@@ -156,7 +156,6 @@ def clients(_id=None):
 @login_required
 def tracks(_id=None):
     db = TracksDB()
-    print('Tracks')
     return simple_api(db, TRACKS_PARAMS, _id)
 
 
