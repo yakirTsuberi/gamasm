@@ -102,7 +102,7 @@ class AdminDB(DB):
     def set(self, admin_email, admin_password, permissions):
         try:
             session.add(self._class(admin_email=admin_email,
-                                    admin_password=admin_password,
+                                    admin_password=generate_password_hash(admin_password),
                                     permissions=permissions))
             session.commit()
             return True
@@ -134,11 +134,13 @@ class AdminDB(DB):
     def all(self):
         return session.query(*self._class.__table__.columns).all()
 
-    def get(self, _id=None):
+    def get(self, _id=None, admin_email=None):
         q = session.query(*self._class.__table__.columns)
         if _id is not None:
             q = q.filter(self._class.id == _id)
-        if q.count() > 1 or _id is None:
+        if admin_email is not None:
+            q = q.filter(self._class.admin_email == admin_email)
+        if q.count() > 1:
             return q.all()
         return q.first()
 
@@ -199,7 +201,7 @@ class UsersDB(DB):
         try:
             session.add(self._class(group_id=group_id,
                                     user_email=str(user_email).lower(),
-                                    user_password=self.set_password(user_password),
+                                    user_password=generate_password_hash(user_password),
                                     user_first_name=str(user_first_name).lower(),
                                     user_last_name=str(user_last_name).lower(),
                                     user_phone=user_phone))
@@ -245,10 +247,6 @@ class UsersDB(DB):
         if q.count() > 1 or user_email is None:
             return q.all()
         return q.first()
-
-    @staticmethod
-    def set_password(password):
-        return generate_password_hash(password)
 
 
 class TmpDB(DB):
@@ -321,7 +319,7 @@ class TracksDB(DB):
             q = q.filter(self._class.kosher == kosher)
         return q.all()
 
-    def get(self, _id):
+    def get(self, _id=None):
         q = session.query(*self._class.__table__.columns)
         if _id is not None:
             q = q.filter(self._class.id == _id)
@@ -481,3 +479,8 @@ class TransactionsDB(DB):
 
 if __name__ == '__main__':
     pass
+    # create_all_tables()
+    # AdminDB().set('yakir@ravtech.co.il', '123', 3)
+
+    # GroupsDB().set('test')
+    # UsersDB().set(1, 'yakir@ravtech.co.il', '123', 'יקיר', 'צובירי')

@@ -1,9 +1,10 @@
 import json
 from datetime import timedelta
 
-from flask import Flask, request, jsonify, abort, Response
-from flask_jwt import JWT, jwt_required, current_identity, CONFIG_DEFAULTS
-from werkzeug.security import safe_str_cmp, check_password_hash
+from flask import Flask, request, jsonify, abort, Response, redirect, url_for, render_template
+from flask_jwt import JWT, CONFIG_DEFAULTS  # ,jwt_required
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import check_password_hash
 
 from database import session, create_all_tables, UsersDB, GroupsDB, TransactionsDB, AdminDB, ClientsDB, \
     TracksDB
@@ -24,13 +25,27 @@ def authenticate(username, password):
 
 
 def identity(payload):
-    print(payload)
     _id = payload['identity']
     return UsersDB().get(_id=_id)
 
 
 CONFIG_DEFAULTS['JWT_EXPIRATION_DELTA'] = timedelta(days=30)
 jwt = JWT(app, authenticate, identity)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+class User(UserMixin):
+    pass
+
+
+@login_manager.user_loader
+def user_loader(admin_email):
+    if AdminDB().get(admin_email=admin_email):
+        user = User()
+        user.id = admin_email
+        return user
+
 
 ADMINS_PARAMS = ['admin_email', 'admin_password', 'permissions']
 GROUPS_PARAMS = ['group_name']
@@ -81,49 +96,73 @@ def simple_api(db, data_params, _id=None):
     return abort(400)
 
 
-@app.route('/api/admins', methods=['GET', 'POST'])
-@app.route('/api/admins/<_id>', methods=['GET', 'PUT', 'DELETE'])
-@jwt_required()
-def admins(_id=None):
-    db = AdminDB()
-    return simple_api(db, ADMINS_PARAMS, _id)
+@app.route('/admin/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+
+    admin_email = request.form.get('admin_email')
+    db = AdminDB().get(admin_email=admin_email)
+    if db:
+        if check_password_hash(db.admin_password, request.form.get('admin_password')):
+            user = User()
+            user.id = admin_email
+            login_user(user, remember=request.form.get('remember-me') == 'on')
+            return redirect(url_for('index'))
+
+    return redirect(url_for('login'))
 
 
-@app.route('/api/groups', methods=['GET', 'POST'])
-@app.route('/api/groups/<id_or_name>', methods=['GET', 'DELETE'])
-@jwt_required()
+@app.route('/admin/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.route('/admin/index')
+def index():
+    if current_user.is_authenticated:
+        return render_template('admin.html')
+    return redirect(url_for('login'))
+
+
+@app.route('/api/admin/groups', methods=['GET', 'POST'])
+@app.route('/api/admin/groups/<id_or_name>', methods=['GET', 'DELETE'])
+@login_required
 def groups(id_or_name=None):
     db = GroupsDB()
     return simple_api(db, GROUPS_PARAMS, id_or_name)
 
 
-@app.route('/api/users', methods=['GET', 'POST'])
-@app.route('/api/users/<_id>', methods=['GET', 'PUT', 'DELETE'])
-@jwt_required()
+@app.route('/api/admin/users', methods=['GET', 'POST'])
+@app.route('/api/admin/users/<_id>', methods=['GET', 'PUT', 'DELETE'])
+@login_required
 def users(_id=None):
     db = UsersDB()
     return simple_api(db, USERS_PARAMS, _id)
 
 
-@app.route('/api/clients', methods=['GET', 'POST'])
-@app.route('/api/clients/<_id>', methods=['GET', 'PUT', 'DELETE'])
-@jwt_required()
+@app.route('/api/admin/clients', methods=['GET', 'POST'])
+@app.route('/api/admin/clients/<_id>', methods=['GET', 'PUT', 'DELETE'])
+@login_required
 def clients(_id=None):
     db = ClientsDB()
     return simple_api(db, CLIENTS_PARAMS, _id)
 
 
-@app.route('/api/tracks', methods=['GET', 'POST'])
-@app.route('/api/tracks/<_id>', methods=['GET', 'PUT', 'DELETE'])
-@jwt_required()
+@app.route('/api/admin/tracks', methods=['GET', 'POST'])
+@app.route('/api/admin/tracks/<_id>', methods=['GET', 'PUT', 'DELETE'])
+@login_required
 def tracks(_id=None):
     db = TracksDB()
+    print('Tracks')
     return simple_api(db, TRACKS_PARAMS, _id)
 
 
-@app.route('/api/transactions', methods=['GET', 'POST'])
-@app.route('/api/transactions/<_id>', methods=['GET', 'PUT', 'DELETE'])
-@jwt_required()
+@app.route('/api/admin/transactions', methods=['GET', 'POST'])
+@app.route('/api/admin/transactions/<_id>', methods=['GET', 'PUT', 'DELETE'])
+@login_required
 def transactions(_id=None):
     db = TransactionsDB()
     if request.method == 'GET':

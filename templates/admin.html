@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>מנהל</title>
-    <link rel="stylesheet" href="/static/src/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/src/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/main.css">
+
     <style>
         .table-responsive {
             border-top: none;
         }
     </style>
 </head>
-<body ng-controller="MainController as mc">
-<div class="container"><h1 style="text-align: center">- Gama S.M. -</h1></div>
-<div id="main_tabs" class="container" style="direction: rtl">
+<body>
+<div class="container"><h1 class="login-form-title" style="text-align: center; direction: ltr">GAMA-S.M.</h1>
+</div>
+<div id="main_tabs" class="container">
     <ul class="nav nav-tabs nav-tabs-responsive">
         <li class="active"><a href="#1" data-toggle="tab"><span class="text">מצב מכירות</span></a></li>
         <li class="next"><a href="#2" data-toggle="tab"><span class="text">מידע כללי</span></a></li>
@@ -23,7 +26,7 @@
 
     <div class="tab-content">
         <div class="tab-pane active" id="1">
-            <div class="table-responsive" ng-include="'/static/html/status_sale.html'"></div>
+            <div ng-include="'/static/admin/status_sale/status_sale.html'"></div>
         </div>
         <div class="tab-pane" id="2">
             <h3>מידע כללי</h3>
@@ -32,7 +35,7 @@
             <h3>קבוצות וסוכנים</h3>
             <div class="col-md-3">
                 <div>
-                    <button>הוסף קבוצה
+                    <button class="login-form-btn">הוסף קבוצה
                     </button>
                 </div>
                 <ul class="nav nav-pills nav-stacked"></ul>
@@ -43,52 +46,20 @@
             <h3>לקוחות</h3>
         </div>
         <div class="tab-pane" id="5">
-            <h3>מסלולים</h3>
-            <div class="col-md-3">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#cellcom" data-toggle="tab">סלקום</a></li>
-                    <li><a href="#partner" data-toggle="tab">פרטנר</a></li>
-                    <li><a href="#pelephon" data-toggle="tab">פלאפון</a></li>
-                    <li><a href="#012" data-toggle="tab">012</a></li>
-                    <li><a href="#hot" data-toggle="tab">הוט</a></li>
-                    <li><a href="#golan" data-toggle="tab">גולן</a></li>
-                    <li><a href="#rami_levi" data-toggle="tab">רמי לוי</a></li>
-                </ul>
-            </div>
-            <div class="col-md-9 tab-content">
-                <div class="tab-pane active" id="cellcom">
-                    <h4>סלקום</h4>
-                </div>
-                <div class="tab-pane" id="partner">
-                    <h4>פרטנר</h4>
-                </div>
-                <div class="tab-pane" id="pelephon">
-                    <h4>פלאפון</h4>
-                </div>
-                <div class="tab-pane" id="012">
-                    <h4>012 מובייל</h4>
-                </div>
-                <div class="tab-pane" id="hot">
-                    <h4>הוט מובייל</h4>
-                </div>
-                <div class="tab-pane" id="golan">
-                    <h4>גולן טלקום</h4>
-                </div>
-                <div class="tab-pane" id="rami_levi">
-                    <h4>רמי לוי</h4>
-                </div>
-            </div>
+            <div ng-include="'/static/admin/tracks/tracks.html'"></div>
         </div>
     </div>
 
 </div>
 
-<script src="/static/src/jquery-3.2.1.min.js"></script>
+<script src="/static/src/vendor/jquery/js/jquery-3.2.1.min.js"></script>
 <script src="/static/src/tether.min.js"></script>
-<script src="/static/src/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/src/brt/brt.js"></script>
-<script src="/static/src/angular.min.js"></script>
+<script src="/static/src/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/src/vendor/angularjs/angular.min.js"></script>
 <script src="/static/src/sortable.js"></script>
+
 <script src="/static/app.js"></script>
+<script src="/static/admin/status_sale/status_sale.js"></script>
+<script src="/static/admin/tracks/tracks.js"></script>
 </body>
 </html>

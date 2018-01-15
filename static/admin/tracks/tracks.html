@@ -1,0 +1,18 @@
+<div ng-controller="TracksContainer as tc">
+    <h3>מסלולים</h3>
+    <div class="col-md-3">
+        <ul class="nav nav-pills nav-stacked">
+            <li ng-repeat="(k, v) in tc.companies" ng-class="$index == 0 ? 'active': ''">
+                <a href="#{a k a}" data-toggle="tab">{a v a}</a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-md-9 tab-content">
+        <div ng-repeat="(k, v) in tc.companies" ng-class="$index == 0 ? 'tab-pane active': 'tab-pane'" id="{a k a}">
+            <h4>
+                {a v a}
+                <button class="btn btn-primary pull-left"><span class="glyphicon glyphicon-plus"></span></button>
+            </h4>
+        </div>
+    </div>
+</div>
