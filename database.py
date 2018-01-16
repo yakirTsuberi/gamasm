@@ -1,4 +1,5 @@
 import logging
+import random
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
@@ -7,6 +8,13 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, F
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
+import yagmail
+
+
+def send_email(to, subject=None, contents=None):
+    yag = yagmail.SMTP(user='gamasm.com@gmail.com', password='1qaz@WSX!')
+    yag.send(to=to, subject=subject, contents=contents)
+
 
 DB_PATH = 'sqlite:///' + str(Path(__file__).parent / 'data.db')
 engine = create_engine(DB_PATH, connect_args={'check_same_thread': False})
@@ -49,7 +57,11 @@ class Tmp(Base):
     __tablename__ = 'Tmp'
     id = Column(Integer, primary_key=True)
     unique_id = Column(String, unique=True)
-    email_user = Column(String, ForeignKey(Users.user_email))
+    group_id = Column(Integer, ForeignKey(Groups.id))
+    user_email = Column(String)
+    user_first_name = Column(String)
+    user_last_name = Column(String)
+    user_phone = Column(String, nullable=True)
 
 
 class Tracks(Base):
@@ -170,6 +182,8 @@ class GroupsDB(DB):
     def delete(self, _id):
         try:
             session.query(self._class).filter(self._class.id == _id).delete()
+            for u in session.query(Users.id).filter(Users.group_id == _id).all():
+                session.query(Users).filter(Users.id == u.id).delete()
             session.commit()
             return True
         except Exception as e:
@@ -239,7 +253,9 @@ class UsersDB(DB):
         return q.all()
 
     def get(self, user_email=None, _id=None):
-        q = session.query(*self._class.__table__.columns)
+        q = session.query(Users.id, Users.group_id, Users.user_email,
+                          Users.user_password, Users.user_first_name,
+                          Users.user_last_name, Users.user_phone)
         if user_email is not None:
             q = q.filter(self._class.user_email == user_email)
         if _id is not None:
@@ -253,24 +269,37 @@ class TmpDB(DB):
     def __init__(self):
         super().__init__(Tmp)
 
-    def set(self, unique_id, email_user):
+    def set(self, group_id, user_email, user_first_name, user_last_name, user_phone):
         try:
-            session.add(self._class(unique_id=unique_id, email_user=email_user))
+            unique_id = generate_password_hash(str(random.randrange(10000000000000000000)))
+            session.add(self._class(unique_id=unique_id,
+                                    group_id=group_id, user_email=user_email, user_first_name=user_first_name,
+                                    user_last_name=user_last_name, user_phone=user_phone))
             session.commit()
+            ht = 'לסיום תהליך ההרשמה נא אמת חשבון בלינק'
+            send_email(user_email, 'Welcome to GAMA.S.M.', f'{ht}: 127.0.0.1:8080/singup?unique_id={unique_id}')
+            return True
+        except Exception as e:
+            logging.error(e)
+            print(e)
+            session.rollback()
+            return False
+
+    def delete(self, user_email):
+        try:
+            session.query(self._class).filter(self._class.user_email == user_email).delete()
+            session.commit()
+            return True
         except Exception as e:
             logging.error(e)
             session.rollback()
+            return False
 
-    def delete(self, email_user):
-        try:
-            session.query(self._class).filter(self._class.email_user == email_user).delete()
-            session.commit()
-        except Exception as e:
-            logging.error(e)
-            session.rollback()
+    def get(self, unique_id):
+        return session.query(*self._class.__table__.columns).filter(self._class.unique_id == unique_id).first()
 
-    def get(self, email_user):
-        return session.query(*self._class.__table__.columns).filter(self._class.email_user == email_user).first()
+    def all(self):
+        return session.query(*self._class.__table__.columns).all()
 
 
 class TracksDB(DB):
@@ -479,9 +508,3 @@ class TransactionsDB(DB):
 
 if __name__ == '__main__':
     pass
-    print(TracksDB().get())
-    # create_all_tables()
-    # AdminDB().set('yakir@ravtech.co.il', '123', 3)
-
-    # GroupsDB().set('test')
-    # UsersDB().set(1, 'yakir@ravtech.co.il', '123', 'יקיר', 'צובירי')

@@ -3,24 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>מנהל</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--===============================================================================================-->
     <link rel="icon" type="image/png" href="/static/src/images/icons/favicon.ico"/>
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="/static/src/vendor/bootstrap/css/bootstrap.min.css">
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="/static/src/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="/static/src/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="/static/src/vendor/animate/animate.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="/static/src/vendor/css-hamburgers/hamburgers.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="/static/src/vendor/animsition/css/animsition.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="/static/src/vendor/select2/select2.min.css">
-    <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="/static/src/vendor/daterangepicker/daterangepicker.css">
     <!--===============================================================================================-->
     <link rel="stylesheet" href="/static/main.css">
     <link rel="stylesheet" href="/static/util.css">
@@ -45,15 +34,7 @@
             <h3>מידע כללי</h3>
         </div>
         <div class="tab-pane" id="3">
-            <h3>קבוצות וסוכנים</h3>
-            <div class="col-md-3">
-                <div>
-                    <button class="login-form-btn">הוסף קבוצה
-                    </button>
-                </div>
-                <ul class="nav nav-pills nav-stacked"></ul>
-            </div>
-            <div class="col-md-9 tab-content"></div>
+            <div ng-include="'/static/admin/groups_and_users/groups_and_users.html'"></div>
         </div>
         <div class="tab-pane" id="4">
             <h3>לקוחות</h3>
@@ -64,26 +45,19 @@
     </div>
 
 </div>
-<!--===============================================================================================-->
 <script src="/static/src/vendor/jquery/js/jquery-3.2.1.min.js"></script>
-<!--===============================================================================================-->
-<script src="/static/src/vendor/animsition/js/animsition.min.js"></script>
 <!--===============================================================================================-->
 <script src="/static/src/vendor/bootstrap/js/bootstrap.min.js"></script>
 <!--===============================================================================================-->
-<script src="/static/src/vendor/select2/select2.min.js"></script>
-<!--===============================================================================================-->
-<script src="/static/src/vendor/daterangepicker/moment.min.js"></script>
-<script src="/static/src/vendor/daterangepicker/daterangepicker.js"></script>
-<!--===============================================================================================-->
-<script src="/static/src/vendor/countdowntime/countdowntime.js"></script>
-<!--===============================================================================================-->
 <script src="/static/src/tether.min.js"></script>
+<!--===============================================================================================-->
 <script src="/static/src/vendor/angularjs/angular.min.js"></script>
 <script src="/static/src/sortable.js"></script>
 <!--===============================================================================================-->
 <script src="/static/app.js"></script>
+<!--===============================================================================================-->
 <script src="/static/admin/status_sale/status_sale.js"></script>
 <script src="/static/admin/tracks/tracks.js"></script>
+<script src="/static/admin/groups_and_users/groups_and_users.js"></script>
 </body>
 </html>

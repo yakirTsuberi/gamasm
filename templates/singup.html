@@ -7,8 +7,6 @@
     <!--===============================================================================================-->
     <link rel="icon" type="image/png" href="/static/src/images/icons/favicon.ico"/>
     <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="/static/src/vendor/bootstrap/css/bootstrap.min.css">
-    <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="/static/src/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="/static/util.css">
@@ -20,41 +18,26 @@
 <div class="limiter">
     <div class="container-login">
         <div class="wrap-login p-t-50 p-b-90">
-            <form class="login-form validate-form flex-sb flex-w" action="/admin/login" method="post">
+            <form class="login-form validate-form flex-sb flex-w" action="/singup" method="post">
 					<span class="login-form-title p-b-51">
 						GAMA-S.M.
 					</span>
 
 
-                <div class="wrap-input validate-input m-b-16" data-validate="שם משתמש">
-                    <input class="input" type="text" name="admin_email" placeholder="אימייל">
-                    <span class="focus-input"></span>
-                </div>
-
-
                 <div class="wrap-input validate-input m-b-16" data-validate="סיסמה">
-                    <input class="input" type="password" name="admin_password" placeholder="סיסמה">
+                    <input class="input" type="password" name="password" placeholder="סיסמה">
                     <span class="focus-input"></span>
                 </div>
-
-                <div class="flex-sb-m w-full p-t-3 p-b-24">
-                    <div class="contact-form-checkbox">
-                        <input class="input-checkbox" id="ckb1" type="checkbox" name="remember-me">
-                        <label class="label-checkbox" for="ckb1">
-                            זכור אותי
-                        </label>
-                    </div>
-
-                    <div>
-                        <a href="#" class="txt1">
-                            שכחת שם משתמש או סיסמה?
-                        </a>
-                    </div>
+                <div class="wrap-input validate-input m-b-16" data-validate="סיסמה">
+                    <input class="input" type="password" name="password_again" placeholder="הכנס שוב סיסמה">
+                    <span class="focus-input"></span>
                 </div>
-
+                <label>
+                    <input hidden type="text" name="u" value="{{ u }}">
+                </label>
                 <div class="container-login-form-btn m-t-17">
-                    <button class="login-form-btn btn-block">
-                        הכנס
+                    <button type="submit" class="login-form-btn btn-block">
+                        הרשם
                     </button>
                 </div>
 
@@ -68,8 +51,6 @@
 
 <!--===============================================================================================-->
 <script src="/static/src/vendor/jquery/js/jquery-3.2.1.min.js"></script>
-<script src="/static/src/vendor/bootstrap/js/bootstrap.min.js"></script>
-<!--===============================================================================================-->
 <script src="/static/login/js/main.js"></script>
 
 </body>

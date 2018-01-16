@@ -1,0 +1,227 @@
+<div ng-controller="GAUContainer as gauc">
+    <h3>קבוצות וסוכנים</h3>
+    <div class="col-md-3">
+        <button class="login-form-btn" style="margin-bottom: 10px" data-toggle="modal" data-target="#groupPostModal">
+            <span>קבוצה חדשה</span>
+        </button>
+        <ul class="nav nav-pills nav-stacked">
+            <li ng-repeat="g in gauc.groups" ng-class="$index == 0 ? 'active': ''">
+                <a href="#{a g.group_name a}" data-toggle="tab">{a g.group_name a}
+                    <span ng-click="gauc.select_group=g" data-toggle="modal" data-target="#groupDeleteModal" class="pull-left glyphicon glyphicon-remove"></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-md-9 tab-content">
+        <div ng-repeat="g in gauc.groups" ng-class="$index == 0 ? 'tab-pane active': 'tab-pane'"
+             id="{a g.group_name a}">
+            <h4>
+                {a g.group_name a}
+                <button class="login-form-btn pull-left" data-toggle="modal" data-target="#userPostModal"
+                        ng-click="gauc.params.groups=g;gauc.params.users.group_id=g.id">
+                    <span>סוכן חדש</span>
+                </button>
+            </h4>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>אימייל</th>
+                    <th>שם</th>
+                    <th>משפחה</th>
+                    <th>טלפון</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="t in gauc.users" ng-if="t.group_id == g.id">
+                    <td>{a t.user_email a}</td>
+                    <td>{a t.user_first_name a}</td>
+                    <td>{a t.user_last_name a}</td>
+                    <td>{a t.user_phone a}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-link" type="button" data-toggle="dropdown"
+                                    ng-click="gauc.select_user=t">
+                                <span class="glyphicon glyphicon glyphicon-chevron-down"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a data-toggle="modal" data-target="#userPutModal">
+                                        <span class="text-info glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a data-toggle="modal" data-target="#userDeletetModal">
+                                        <span class="text-danger glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="groupPostModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">קבוצה חדשה</h3>
+                </div>
+                <div class="modal-body">
+
+                    <form class="login-form validate-form flex-sb flex-w">
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="gauc.params.groups.group_name"
+                                   placeholder="שם">
+                            <span class="focus-input"></span>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">סגור</button>
+                    <button type="submit" class="btn btn-primary" ng-click="gauc.post_group()">הוסף</button>
+                    <!--<button type="button" class="login-form-btn" data-dismiss="modal">שמור</button>-->
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="groupDeleteModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">האם בטוח שברצונך למחוק?</h3>
+                </div>
+                <div class="modal-body">
+                    <p>קבוצה: {a gauc.select_group.group_name a}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">לא, אל תמחוק.</button>
+                    <button type="submit" class="btn btn-danger" ng-click="gauc.delete_groups()">כן, תמחוק</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="userPostModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">סוכן חדש - <span>{a gauc.params.groups.group_name a}</span></h3>
+                </div>
+                <div class="modal-body">
+                    <!--['group_id', 'user_email', 'user_password', 'user_first_name', 'user_last_name', 'user_phone']-->
+
+                    <form class="login-form validate-form flex-sb flex-w">
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="email" ng-model="gauc.params.users.user_email"
+                                   placeholder="אימייל">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="gauc.params.users.user_first_name"
+                                   placeholder="שם">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="gauc.params.users.user_last_name"
+                                   placeholder="משפחה">
+                            <span class="focus-input"></span>
+                        </div>
+
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="gauc.params.users.user_phone"
+                                   placeholder="טלפון">
+                            <span class="focus-input"></span>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">סגור</button>
+                    <button type="submit" class="btn btn-primary" ng-click="gauc.post_user()">הוסף</button>
+                    <!--<button type="button" class="login-form-btn" data-dismiss="modal">שמור</button>-->
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="userDeletetModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">האם בטוח שברצונך למחוק?</h3>
+                </div>
+                <div class="modal-body">
+                    <p>סוכן: {a gauc.select_user.user_first_name a} {a gauc.select_user.user_last_name a}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">לא, אל תמחוק.</button>
+                    <button type="submit" class="btn btn-danger" ng-click="gauc.delete_users()">כן, תמחוק</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="userPutModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">עריכת סוכן</h3>
+                </div>
+                <div class="modal-body">
+
+                    <form class="login-form validate-form flex-sb flex-w">
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="email" ng-model="gauc.select_user.user_email"
+                                   placeholder="אימייל">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="gauc.select_user.user_first_name"
+                                   placeholder="שם">
+                            <span class="focus-input"></span>
+                        </div>
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="gauc.select_user.user_last_name"
+                                   placeholder="משפחה">
+                            <span class="focus-input"></span>
+                        </div>
+
+                        <div class="wrap-input validate-input m-b-10">
+                            <input class="input classic" type="text" ng-model="gauc.select_user.user_phone"
+                                   placeholder="טלפון">
+                            <span class="focus-input"></span>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">סגור</button>
+                    <button type="submit" class="btn btn-primary" ng-click="gauc.put_users()">שמור</button>
+                    <!--<button type="button" class="login-form-btn" data-dismiss="modal">שמור</button>-->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

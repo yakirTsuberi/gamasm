@@ -7,12 +7,10 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import check_password_hash
 
 from database import session, create_all_tables, UsersDB, GroupsDB, TransactionsDB, AdminDB, ClientsDB, \
-    TracksDB
+    TracksDB, TmpDB
 from config import base_to_dict, datetime_handler, verify_request
 
 SECRET = '>Nv}mH^23P-P3U:_e[^m]Wj+v<(T6TH!'
-
-create_all_tables()
 
 app = Flask(__name__)
 app.secret_key = SECRET
@@ -50,6 +48,7 @@ def user_loader(admin_email):
 ADMINS_PARAMS = ['admin_email', 'admin_password', 'permissions']
 GROUPS_PARAMS = ['group_name']
 USERS_PARAMS = ['group_id', 'user_email', 'user_password', 'user_first_name', 'user_last_name', 'user_phone']
+TMP_PARAMS = ['group_id', 'user_email', 'user_first_name', 'user_last_name', 'user_phone']
 CLIENTS_PARAMS = ['client_id', 'client_first_name', 'client_last_name', 'client_address', 'city', 'client_phone',
                   'client_email']
 TRACKS_PARAMS = ['company', 'price', 'track_name', 'description', 'kosher']
@@ -63,6 +62,7 @@ def get(db, _id=None):
 
 
 def post(db, data_params):
+    print(request.json)
     if verify_request(request, data_params):
         return _response(db.set(**request.json))
     abort(400)
@@ -143,6 +143,14 @@ def users(_id=None):
     return simple_api(db, USERS_PARAMS, _id)
 
 
+@app.route('/api/admin/tmp', methods=['GET', 'POST'])
+@app.route('/api/admin/tmp/<_id>', methods=['DELETE'])
+@login_required
+def tmp(_id=None):
+    db = TmpDB()
+    return simple_api(db, TMP_PARAMS, _id)
+
+
 @app.route('/api/admin/clients', methods=['GET', 'POST'])
 @app.route('/api/admin/clients/<_id>', methods=['GET', 'PUT', 'DELETE'])
 @login_required
@@ -169,10 +177,32 @@ def transactions(_id=None):
     return simple_api(db, TRANSACTIONS_PARAMS, _id)
 
 
+@app.route('/singup', methods=['GET', 'POST'])
+def singup():
+    if request.method == 'GET':
+        u = TmpDB().get(request.args.get('unique_id'))
+        if u:
+            return render_template('singup.html', u=json.dumps(base_to_dict(u)))
+    if request.method == 'POST':
+        if request.form.get('password') == request.form.get('password_again'):
+            u = request.form.get('u')
+            if u:
+                u = json.loads(u)
+                u['user_password'] = request.form.get('password')
+                del u['id']
+                del u['unique_id']
+                if UsersDB().set(**u):
+                    TmpDB().delete(u.get('user_email'))
+                return 'כל הכבוד!'
+    return ''
+
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
+    print(exception)
     session.close()
 
 
 if __name__ == '__main__':
+    create_all_tables()
     app.run(debug=True, port=8080)

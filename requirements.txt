@@ -1,3 +1,6 @@
+yagmail
+werkzeug
 PyJWT
 sqlalchemy
 flask
+flask-login
