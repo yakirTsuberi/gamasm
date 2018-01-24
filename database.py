@@ -277,7 +277,7 @@ class TmpDB(DB):
                                     user_last_name=user_last_name, user_phone=user_phone))
             session.commit()
             ht = 'לסיום תהליך ההרשמה נא אמת חשבון בלינק'
-            send_email(user_email, 'Welcome to GAMA.S.M.', f'{ht}: 127.0.0.1:8080/singup?unique_id={unique_id}')
+            send_email(user_email, 'Welcome to GAMA.S.M.', f'{ht}: 127.0.0.1:8080/singUp?unique_id={unique_id}')
             return True
         except Exception as e:
             logging.error(e)
@@ -508,3 +508,4 @@ class TransactionsDB(DB):
 
 if __name__ == '__main__':
     pass
+    # AdminDB().set('yakir@ravtech.co.il', '123', 3)

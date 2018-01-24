@@ -4,3 +4,4 @@ PyJWT
 sqlalchemy
 flask
 flask-login
+flask-jwt

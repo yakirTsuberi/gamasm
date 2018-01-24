@@ -177,12 +177,12 @@ def transactions(_id=None):
     return simple_api(db, TRANSACTIONS_PARAMS, _id)
 
 
-@app.route('/singup', methods=['GET', 'POST'])
-def singup():
+@app.route('/singUp', methods=['GET', 'POST'])
+def sing_up():
     if request.method == 'GET':
         u = TmpDB().get(request.args.get('unique_id'))
         if u:
-            return render_template('singup.html', u=json.dumps(base_to_dict(u)))
+            return render_template('sing_up.html', u=json.dumps(base_to_dict(u)))
     if request.method == 'POST':
         if request.form.get('password') == request.form.get('password_again'):
             u = request.form.get('u')

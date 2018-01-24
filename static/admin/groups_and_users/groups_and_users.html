@@ -7,7 +7,8 @@
         <ul class="nav nav-pills nav-stacked">
             <li ng-repeat="g in gauc.groups" ng-class="$index == 0 ? 'active': ''">
                 <a href="#{a g.group_name a}" data-toggle="tab">{a g.group_name a}
-                    <span ng-click="gauc.select_group=g" data-toggle="modal" data-target="#groupDeleteModal" class="pull-left glyphicon glyphicon-remove"></span>
+                    <span ng-click="gauc.select_group=g" data-toggle="modal" data-target="#groupDeleteModal"
+                          class="pull-left glyphicon glyphicon-remove"></span>
                 </a>
             </li>
         </ul>
@@ -123,8 +124,6 @@
                     <h3 class="modal-title">סוכן חדש - <span>{a gauc.params.groups.group_name a}</span></h3>
                 </div>
                 <div class="modal-body">
-                    <!--['group_id', 'user_email', 'user_password', 'user_first_name', 'user_last_name', 'user_phone']-->
-
                     <form class="login-form validate-form flex-sb flex-w">
                         <div class="wrap-input validate-input m-b-10">
                             <input class="input classic" type="email" ng-model="gauc.params.users.user_email"
@@ -148,11 +147,14 @@
                             <span class="focus-input"></span>
                         </div>
                     </form>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">סגור</button>
-                    <button type="submit" class="btn btn-primary" ng-click="gauc.post_user()">הוסף</button>
+                    <button type="submit" class="btn btn-primary" ng-click="gauc.post_user()"
+                            ng-disabled="gauc.post_user_btn">
+                        <span ng-show="gauc.post_user_btn"><img src="/static/src/images/Rolling-1s-200px.svg" width="20" height="20"></span>
+                        הוסף
+                    </button>
                     <!--<button type="button" class="login-form-btn" data-dismiss="modal">שמור</button>-->
                 </div>
             </div>

@@ -16,9 +16,11 @@ app.controller('GAUContainer', function ($scope, $http) {
         }, errorCallback());
     };
     vm.post_user = function () {
+        vm.post_user_btn = true;
         $http.post('/api/admin/tmp', vm.params.users).then(function (value) {
             console.log(value);
             vm.get_users();
+            vm.post_user_btn = false;
             $('#userPostModal').modal('toggle');
             vm.params = setUpParams();
         }, errorCallback());
