@@ -5,3 +5,4 @@ sqlalchemy
 flask
 flask-login
 flask-jwt
+python-dateutil

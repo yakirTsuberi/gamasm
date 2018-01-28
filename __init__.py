@@ -2,7 +2,7 @@ import json
 from datetime import timedelta
 
 from flask import Flask, request, jsonify, abort, Response, redirect, url_for, render_template
-from flask_jwt import JWT, CONFIG_DEFAULTS  # ,jwt_required
+from flask_jwt import JWT, CONFIG_DEFAULTS, jwt_required, current_identity
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash
 
@@ -195,6 +195,13 @@ def sing_up():
                     TmpDB().delete(u.get('user_email'))
                 return 'כל הכבוד!'
     return ''
+
+
+@app.route('/api/transactions_by_user')
+@jwt_required()
+def transactions_by_user():
+    db = TransactionsDB()
+    return jsonify(db.get_by_user(current_identity.user_email))
 
 
 @app.teardown_appcontext

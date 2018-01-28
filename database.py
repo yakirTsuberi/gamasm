@@ -1,10 +1,11 @@
 import logging
 import random
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from pathlib import Path
 from typing import Dict, List
 
-from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, ForeignKey, DateTime, Date
+from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, ForeignKey, DateTime, Date, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
@@ -89,7 +90,7 @@ class Clients(Base):
 class Transactions(Base):
     __tablename__ = 'Transactions'
     id = Column(Integer, primary_key=True)
-    email_user = Column(String, ForeignKey(Users.user_email))
+    user_email = Column(String, ForeignKey(Users.user_email))
     track_id = Column(Integer, ForeignKey(Tracks.id))
     client_id = Column(String, ForeignKey(Clients.client_id))
     payment = Column(String)  # TODO check is json
@@ -97,7 +98,6 @@ class Transactions(Base):
     sim_num = Column(String)
     phone_num = Column(String)
     status = Column(Integer)  # 0=new, 1=success, 2=fail
-    transaction_client = Column(String, nullable=True)  # TODO ?
     comment = Column(String, nullable=True)
     reminds = Column(Date, nullable=True)
 
@@ -260,7 +260,7 @@ class UsersDB(DB):
             q = q.filter(self._class.user_email == user_email)
         if _id is not None:
             q = q.filter(self._class.id == _id)
-        if q.count() > 1 or user_email is None:
+        if q.count() > 1 or (user_email is None and _id is None):
             return q.all()
         return q.first()
 
@@ -505,7 +505,24 @@ class TransactionsDB(DB):
             result[t.client_id][t.track_id].append(tmp)
         return result
 
+    @staticmethod
+    def get_by_user(user_email, date: datetime.date = None):
+        # TODO: get all data of Transactions
+        if date is None:
+            date = datetime.utcnow().replace(day=1)
+
+        def _filter(status):
+            return session.query(Transactions).filter(
+                Transactions.user_email == user_email).filter(
+                and_(Transactions.date_time >= date,
+                     Transactions.date_time < (date + relativedelta(months=1)))).filter(
+                Transactions.status == status).count()
+
+        return dict(fail=_filter(2), success=_filter(1), waiting=_filter(0))
+
 
 if __name__ == '__main__':
     pass
+    # create_all_tables()
     # AdminDB().set('yakir@ravtech.co.il', '123', 3)
+    print(TransactionsDB().get_by_user('yakir@ravtech.co.il'))
