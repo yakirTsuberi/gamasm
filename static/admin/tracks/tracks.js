@@ -2,8 +2,8 @@ app.controller('TracksContainer', function ($scope, $http) {
     var vm = this;
     vm.params = setUpParams();
     vm.companies = {
-        cellcom: 'סלקום', partner: 'פרטנר', pelephon: 'פלאפון',
-        '012': '012 מובייל', hot: 'הוט מובייל', golan: 'גולן טלקום', rami_levi: 'רמי לוי'
+        Cellcom: 'סלקום', Partner: 'פרטנר', Pelephon: 'פלאפון',
+        '012Mobile': '012 מובייל', HotMobile: 'הוט מובייל', GolanTelecom: 'גולן טלקום', RamiLevi: 'רמי לוי'
     };
     vm.select_track = null;
 

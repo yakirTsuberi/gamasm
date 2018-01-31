@@ -1,5 +1,15 @@
 import datetime
 
+COMPANIES = {
+    'Cellcom': 'סלקום',
+    'Partner': 'פרטנר',
+    'Pelephon': 'פלאפון',
+    '012Mobile': '012 מובייל',
+    'HotMobile': 'הוט מובייל',
+    'GolanTelecom': 'גולן טלקום',
+    'RamiLevi': 'רמי לוי'
+}
+
 
 def base_to_dict(query):
     def _create_dict(r):
