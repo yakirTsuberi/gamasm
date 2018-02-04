@@ -204,6 +204,13 @@ def transactions_by_user():
     return jsonify(db.get_by_user(current_identity.user_email))
 
 
+@app.route('/api/tracks/<company>')
+@jwt_required()
+def tracks_by_company(company):
+    db = TracksDB()
+    return jsonify(companies=base_to_dict(db.get_by_company(company)))
+
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     print(exception)

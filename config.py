@@ -1,13 +1,13 @@
 import datetime
 
 COMPANIES = {
-    'Cellcom': 'סלקום',
-    'Partner': 'פרטנר',
-    'Pelephon': 'פלאפון',
-    '012Mobile': '012 מובייל',
-    'HotMobile': 'הוט מובייל',
-    'GolanTelecom': 'גולן טלקום',
-    'RamiLevi': 'רמי לוי'
+    'cellcom': 'סלקום',
+    'partner': 'פרטנר',
+    'pelephon': 'פלאפון',
+    'mobile_012': '012 מובייל',
+    'hot_mobile': 'הוט מובייל',
+    'golan_telecom': 'גולן טלקום',
+    'rami_levi': 'רמי לוי'
 }
 
 

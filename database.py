@@ -356,6 +356,9 @@ class TracksDB(DB):
             return q.all()
         return q.first()
 
+    def get_by_company(self, company):
+        return session.query(*self._class.__table__.columns).filter(Tracks.company == company).all()
+
 
 class ClientsDB(DB):
     def __init__(self):
@@ -525,4 +528,5 @@ if __name__ == '__main__':
     pass
     # create_all_tables()
     # AdminDB().set('yakir@ravtech.co.il', '123', 3)
-    print(TransactionsDB().get_by_user('yakir@ravtech.co.il'))
+    # print(TransactionsDB().get_by_user('yakir@ravtech.co.il'))
+    print(TracksDB().get_by_company("cellcom"))
