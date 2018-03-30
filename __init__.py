@@ -219,4 +219,4 @@ def shutdown_session(exception=None):
 
 if __name__ == '__main__':
     create_all_tables()
-    app.run(host='0.0.0.0', debug=True, port=8080)
+    app.run()
