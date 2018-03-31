@@ -528,6 +528,7 @@ class TransactionsDB(DB):
 if __name__ == '__main__':
     pass
     # create_all_tables()
-    AdminDB().set('yakir@ravtech.co.il', '123', 3)
+    # AdminDB().set('yakir@ravtech.co.il', '123', 3)
     # print(TransactionsDB().get_by_user('yakir@ravtech.co.il'))
     # print(TracksDB().get_by_company("cellcom"))
+    GroupsDB().set('test')
