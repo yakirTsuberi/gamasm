@@ -70,6 +70,7 @@ def get(db, _id=None):
 def post(db, data_params):
     print(request.json)
     if verify_request(request, data_params):
+        print(request, data_params)
         return _response(db.set(**request.json))
     abort(400)
 
@@ -225,4 +226,4 @@ def shutdown_session(exception=None):
 
 if __name__ == '__main__':
     create_all_tables()
-    app.run(host='0.0.0.0')
+    app.run()
