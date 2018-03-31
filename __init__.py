@@ -6,6 +6,12 @@ from flask_jwt import JWT, CONFIG_DEFAULTS, jwt_required, current_identity
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash
 
+import sys
+import logging
+
+logging.basicConfig(stream=sys.stderr)
+sys.path.insert(0, "/var/www/gamasm/gamasm/")
+
 from database import session, create_all_tables, UsersDB, GroupsDB, TransactionsDB, AdminDB, ClientsDB, \
     TracksDB, TmpDB
 from config import base_to_dict, datetime_handler, verify_request
