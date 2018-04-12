@@ -531,4 +531,3 @@ if __name__ == '__main__':
     # AdminDB().set('yakir@ravtech.co.il', '123', 3)
     # print(TransactionsDB().get_by_user('yakir@ravtech.co.il'))
     # print(TracksDB().get_by_company("cellcom"))
-    GroupsDB().set('test')
